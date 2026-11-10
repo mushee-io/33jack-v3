@@ -7,15 +7,15 @@
 - Verify `33jack-v3` repository and base SHA against `33jack-v2` without editing V2.
 - Keep imported migration PR #1 unmerged, and stage this milestone in its own draft PR.
 - Retain MIT LICENSE and official Amadeus SDK. Pin M1 network to official Testnet RPC; reject Mainnet and any unapproved alternate RPC.
-- Disable imported Celo, Solana, EVM/x402, settlement, fiat payout, webhook, scheduler and background-send endpoints, including when old environment toggles are set.
-- Retire V2 cron and route aliases. Remove direct Solana runtime dependencies; isolate example environment variables.
+- Disable imported legacy external chain, EVM/x402, settlement, fiat payout, webhook, scheduler and background-send endpoints, including when old environment toggles are set.
+- Retire V2 cron and route aliases. Remove direct legacy external-chain runtime dependencies; isolate example environment variables.
 - Establish `/api/v3/ama`, read-only `/api/health`, safe error codes and network identity.
 - Add CI checks for handler isolation, network guardrails, no simulated settlement claims, build, syntax and Vercel function budget.
 **Acceptance:** M1 draft PR passes GitHub CI; main and V2 unchanged; no legacy route can execute; detailed risk register and rollback documented.
 **State:** In progress on M1 branch.
 
 ## M2 — Amadeus-native wallet, identity and authentication
-- Replace EVM/MetaMask, Celo account, and obsolete Solana wallet flows with Amadeus wallet-extension account discovery and testnet identity.
+- Replace obsolete external-chain wallet flows with Amadeus wallet-extension account discovery and testnet identity.
 - Verify Base58/BLS public-key encoding and wallet network binding; reject wrong networks before any user action.
 - Implement wallet ownership proof using supported native signing and replay-safe server challenge (confirm signature APIs against SDK).
 - Introduce scoped operator/admin/member sessions with explicit origin, nonce, expiry, device/session revocation.
@@ -56,7 +56,7 @@
 - Port invoice import, PDF extraction, beneficiary management and duplicate/risk review to AMA Testnet-backed payment intents.
 - Store exact evidence mapping of invoice → consent → Testnet transaction → verifiable native receipt.
 - Preserve multi-currency invoice descriptions without implying on-chain FX conversion or guaranteed fiat payout.
-- Rebuild exportable receipts and transaction audit API with chain-native identifiers, not EVM/Solana hashes.
+- Rebuild exportable receipts and transaction audit API with chain-native identifiers, not external-chain transaction hashes.
 - Add reconciliation idempotency, failed/partial recovery and no-fabrication reporting.
 **Acceptance:** One invoice is traceable end-to-end to a verified AMA Testnet transfer and honest export.
 **State:** Planned.
@@ -71,7 +71,7 @@
 **State:** Planned.
 
 ## M8 — Complete Amadeus-first UI and documentation migration
-- Replace remaining visible Celo/Solana words, wallet icons, mainnet links, explorer references and stale sample activity.
+- Replace remaining visible obsolete chain names, wallet icons, mainnet links, explorer references and stale sample activity.
 - Rebuild home, agent, invoices, payments, beneficiaries, activity, receipt, mobile and settings screens around AMA Testnet status.
 - Remove unused legacy modules, configs, scripts, env names, code paths and demo-only payment backends.
 - Verify keyboard navigation, error messages, responsive design and no false live-state claims.

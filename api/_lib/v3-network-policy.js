@@ -1,6 +1,6 @@
 /**
  * M1 fail-closed guard. Legacy payment APIs remain callable as endpoints only
- * to return HTTP 410: never reach Celo, Solana, payout providers, or databases.
+ * to return HTTP 410: never reach retired external-chain payment services, payout providers, or databases.
  */
 export const V3_NETWORK = Object.freeze({
   id: "amadeus-testnet",
