@@ -1,15 +1,15 @@
 import {randomUUID} from "node:crypto";
 import {PAYMENT_TOOLS,runAgentPaymentTool} from "./agent-finance-tools.js";
 function card(req) {
- const domain=String(process.env.PUBLIC_APP_URL||"https://33jack-v2.vercel.app").replace(/\/$/,"");
- return {name:"33JACK Finance Agent",description:"Noncustodial Celo business payment intent preparation, verified receipts and reconciliation, controlled by human approvals.",
+ const domain=String(process.env.PUBLIC_APP_URL||"https://33jack-v3.vercel.app").replace(/\/$/,"");
+ return {name:"33JACK Finance Agent",description:"Noncustodial AMA business payment intent preparation, verified receipts and reconciliation, controlled by human approvals.",
   version:"0.3.0",url:domain+"/api/v2/a2a",protocolVersion:"0.3.0",supportedInterfaces:[{url:domain+"/api/v2/a2a",protocolBinding:"JSONRPC",protocolVersion:"0.3.0"}],
   provider:{organization:"Mushee",url:"https://mushee.xyz"},
   capabilities:{streaming:false,pushNotifications:false,stateTransitionHistory:false},
   defaultInputModes:["application/json"],defaultOutputModes:["application/json"],
   securitySchemes:{agentBearer:{type:"http",scheme:"bearer"}},
   security:[{agentBearer:[]}],
-  skills:PAYMENT_TOOLS.map(t=>({id:t.name,name:t.name,description:t.description,tags:["celo","stablecoin","finance"],examples:["Use structured data parts to invoke "+t.name]}))};
+  skills:PAYMENT_TOOLS.map(t=>({id:t.name,name:t.name,description:t.description,tags:["amadeus","testnet","finance"],examples:["Use structured data parts to invoke "+t.name]}))};
 }
 const rpcError=(id,code,message)=>({jsonrpc:"2.0",id:id??null,error:{code,message}});
 export default async function handler(req,res) {
