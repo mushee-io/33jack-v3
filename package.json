@@ -1,6 +1,6 @@
 {
-  "name": "33jack",
-  "version": "0.2.0",
+  "name": "33jack-v3",
+  "version": "0.3.0",
   "private": true,
   "scripts": {
     "dev": "vite",
@@ -8,11 +8,11 @@
     "preview": "vite preview",
     "test:smoke": "node scripts/smoke.mjs",
     "telegram:webhook": "node scripts/setup-telegram.mjs",
-    "test:celo": "node --test scripts/test-celo-v2.mjs",
     "test:vercel": "node scripts/check-vercel-functions.mjs",
     "test:platform": "node --test scripts/test-agent-platform.mjs",
     "test:activation": "node --test scripts/test-activation.mjs",
-    "test:owner": "node --test scripts/test-owner-checkout.mjs"
+    "test:owner": "node --test scripts/test-owner-checkout.mjs",
+    "test:amadeus": "node --test scripts/test-amadeus-v3.mjs"
   },
   "dependencies": {
     "@solana/spl-token": "^0.4.14",
@@ -28,11 +28,13 @@
     "bs58": "^6.0.0",
     "pdfjs-dist": "3.11.174",
     "rpc-websockets": "10.0.0",
-    "uuid": "8.3.2"
+    "uuid": "8.3.2",
+    "@amadeus-protocol/sdk": "^1.7.0"
   },
   "devDependencies": {},
   "overrides": {
     "uuid": "8.3.2",
     "rpc-websockets": "10.0.0"
-  }
+  },
+  "license": "MIT"
 }

@@ -12,11 +12,11 @@ import x402Handler from "./_lib/v2-x402-handler.js";
 import routeHandler from "./_lib/v2-routing-handler.js";
 import metricsHandler from "./_lib/v2-metrics-handler.js";
 import channelHandler from "./_lib/v2-channel-handler.js";
-import celoHandler from "./_lib/v2-celo-handler.js";
+import amaHandler from "./_lib/v3-amadeus-handler.js";
 
 // Consolidated router keeps 33JACK on Vercel Hobby's 12-function limit.
-// Existing /api/v2/agent, /api/v2/channel, /api/v2/celo URLs are preserved.
-const handlers = Object.freeze({operator: operatorPaymentHandler, agent: agentHandler, channel: channelHandler, celo: celoHandler, auth: authHandler, credentials: credentialsHandler, mcp: mcpHandler, a2a: a2aHandler, receipt: receiptHandler, policy: policyHandler, inbox: inboxHandler, schedule: scheduleHandler, x402: x402Handler, routes: routeHandler, metrics: metricsHandler});
+// V3 Amadeus Testnet route. Legacy EVM rail is intentionally not routable.
+const handlers = Object.freeze({operator: operatorPaymentHandler, agent: agentHandler, channel: channelHandler, ama: amaHandler, auth: authHandler, credentials: credentialsHandler, mcp: mcpHandler, a2a: a2aHandler, receipt: receiptHandler, policy: policyHandler, inbox: inboxHandler, schedule: scheduleHandler, x402: x402Handler, routes: routeHandler, metrics: metricsHandler});
 export default async function handler(req, res) {
   const target = String(req.query?.resource || "");
   if (!Object.hasOwn(handlers, target)) return res.status(404).json({error:"Unknown V2 API resource"});

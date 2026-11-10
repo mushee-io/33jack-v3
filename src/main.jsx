@@ -39,7 +39,7 @@ import {
   Zap
 } from "lucide-react";
 import "./styles.css";
-import CeloWorkspace from "./CeloWorkspace.jsx";
+import AmadeusWorkspace from "./AmadeusWorkspace.jsx";
 
 const samplePayments = [
   { company: "Austin Software Inc.", invoice: "US-33018", amount: "$6,250", route: "GBP → USDG → USD", status: "Settled", time: "12 min ago" },
@@ -58,7 +58,7 @@ const nav = [
   ["33Jack Crypto", Coins],
   ["33Jack Invoice", FilePlus2],
   ["Settlement Network", Globe2],
-  ["Celo Mainnet", Wallet],
+  ["Amadeus Testnet", Wallet],
   ["Payments", CircleDollarSign],
   ["Beneficiaries", WalletCards],
   ["Approvals", ShieldCheck],
@@ -74,7 +74,7 @@ const APP_ROUTES = {
   "33Jack Crypto": "/app/crypto",
   "33Jack Invoice": "/app/invoice",
   "Settlement Network": "/app/settlement-network",
-  "Celo Mainnet": "/app/celo",
+  "Amadeus Testnet": "/app/amadeus",
   "Payments": "/app/payments",
   "Beneficiaries": "/app/beneficiaries",
   "Approvals": "/app/approvals"
@@ -2384,7 +2384,7 @@ This invoice is a Jack Swipe beta demonstration.`;
   );
 }
 
-function AgentWorkspace({ onNewPayment, onCelo }) {
+function AgentWorkspace({ onNewPayment, onAmadeus }) {
   const [messages, setMessages] = useState([
     { role: "agent", text: "Ask me about payment risk, failures, suppliers, or what needs attention. I am read-only here; money movement stays behind the structured approval flow." }
   ]);
@@ -2441,7 +2441,7 @@ function AgentWorkspace({ onNewPayment, onCelo }) {
                         <ShieldCheck size={14}/> Open structured approval flow
                       </button>
                     )}
-                    <button type="button" className="secondary" onClick={()=>onCelo?.(m.proposal)}>
+                    <button type="button" className="secondary" onClick={()=>onAmadeus?.(m.proposal)}>
                       <Wallet size={14}/> Prepare wallet-signed Celo payment
                     </button>
                   </div>
@@ -2776,7 +2776,7 @@ function App() {
   const [persistence, setPersistence] = useState("loading");
   const [externalReview, setExternalReview] = useState(null);
   const [externalReviewError, setExternalReviewError] = useState("");
-  const [celoSeed, setCeloSeed] = useState(null);
+  const [amaSeed, setAmaSeed] = useState(null);
 
   function navigateTo(view, options = {}) {
     const nextView = APP_ROUTES[view] ? view : "Overview";
@@ -2827,7 +2827,7 @@ function App() {
         ? params.get("wxToken")
         : params.get("waToken");
 
-    if (window.location.pathname.startsWith("/app/celo")) return;
+    if (window.location.pathname.startsWith("/app/amadeus")) return;
     if (!["whatsapp", "wechat"].includes(channel) || !paymentId || !token) return;
 
     let cancelled = false;
@@ -2886,7 +2886,7 @@ function App() {
           : p.destination_amount || "—",
         route: p.route || "Route pending",
         status:
-          ["settled_devnet","settled_demo","settled_celo"].includes(p.status) ? "Settled"
+          ["settled_devnet","settled_demo","settled_ama"].includes(p.status) ? "Settled"
           : p.status === "approved" || p.status === "settling" ? "Review"
           : p.risk?.duplicate || p.risk?.beneficiary_changed || p.risk?.suspicious ? "Flagged"
           : "Review",
@@ -3053,7 +3053,7 @@ function App() {
 
           <footer><Logo/><p>Autonomous cross-border finance for global businesses.</p><span>Colosseum build · Solana</span></footer>
           </> : active === "Agent" ? (
-            <AgentWorkspace onNewPayment={() => setFlow(true)} onCelo={(proposal)=>{setCeloSeed(proposal);navigateTo("Celo Mainnet");}}/>
+            <AgentWorkspace onNewPayment={() => setFlow(true)} onAmadeus={(proposal)=>{setAmaSeed(proposal);navigateTo("Amadeus Testnet");}}/>
           ) : active === "Voice Pay β" ? (
             <VoicePayWorkspace/>
           ) : active === "Jack Swipe β" ? (
@@ -3075,8 +3075,8 @@ function App() {
             <InvoiceWorkspace onUseInvoice={routeInvoiceToPayment} onNewPayment={() => setFlow(true)}/>
           ) : active === "Settlement Network" ? (
             <SettlementNetworkWorkspace/>
-          ) : active === "Celo Mainnet" ? (
-            <CeloWorkspace seed={celoSeed}/>
+          ) : active === "Amadeus Testnet" ? (
+            <AmadeusWorkspace seed={amaSeed}/>
           ) : (
             <RecordsWorkspace
               type={active}

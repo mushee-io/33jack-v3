@@ -33,6 +33,10 @@
   },
   "rewrites": [
     {
+      "source": "/api/v3/:resource",
+      "destination": "/api/v2?resource=:resource"
+    },
+    {
       "source": "/a2a",
       "destination": "/api/v2/a2a"
     },
