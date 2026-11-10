@@ -170,7 +170,7 @@ function buildProposal(message, payments = []) {
   const payment = findReferencedPayment(message, payments);
   if (!payment) return null;
 
-  const stablecoins = new Set(["USDG", "USDC", "USDT"]);
+  const stablecoins = new Set(["AMA", "USDC", "USDT"]);
   const unit = stablecoins.has(String(payment.destination_currency || "").toUpperCase())
     ? "33Jack Crypto"
     : "33Jack Pay";
