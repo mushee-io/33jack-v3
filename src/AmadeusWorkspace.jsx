@@ -2,6 +2,7 @@ import React,{useCallback,useEffect,useState} from "react";
 import "./amadeus.css";
 import AmadeusIdentityPanel from "./AmadeusIdentityPanel.jsx";
 import AmadeusPaymentPanel from "./AmadeusPaymentPanel.jsx";
+import AmadeusAgentPanel from "./AmadeusAgentPanel.jsx";
 
 const API="/api/v3/ama";
 async function get(operation,query=""){
@@ -13,15 +14,16 @@ async function get(operation,query=""){
 export default function AmadeusWorkspace({seed=null}){
  const [wallet,setWallet]=useState("");
  const [session,setSession]=useState(null);
+ const [agentSeed,setAgentSeed]=useState(null);
  const [health,setHealth]=useState(null);
  const [balance,setBalance]=useState(null);
  const [busy,setBusy]=useState(false);
  const [error,setError]=useState("");
  const onWalletChange=useCallback(address=>{
   setWallet(address||"");setBalance(null);
-  if(!address)setSession(null);
+  if(!address){setSession(null);setAgentSeed(null);}
  },[]);
- const onSessionChange=useCallback(value=>setSession(value||null),[]);
+ const onSessionChange=useCallback(value=>{setSession(value||null);if(!value)setAgentSeed(null)},[]);
  useEffect(()=>{get("health").then(x=>setHealth(x.rpc)).catch(()=>setHealth({reachable:false}));},[]);
  async function refreshBalance(){
   if(!wallet) return;
@@ -31,9 +33,9 @@ export default function AmadeusWorkspace({seed=null}){
   finally{setBusy(false)}
  }
  return <section className="ama-v3">
-  <header><span className="ama-eyebrow">33JACK V3 · AMADEUS TESTNET · M3</span>
+  <header><span className="ama-eyebrow">33JACK V3 · AMADEUS TESTNET · M5</span>
    <h2>AI-assisted payments, governed by your wallet.</h2>
-   <p>Prepare, verify and review exact native AMA transfers. This milestone does not sign, broadcast or reconcile transactions. No fiat off-ramp or stablecoin conversion is implied.</p>
+   <p>Amadeus-native wallet-controlled payment preparation, guarded Testnet execution, and permissioned AI financial analysis. No fiat/off-ramp or autonomous signing.</p>
   </header>
   <AmadeusIdentityPanel onWalletChange={onWalletChange} onSessionChange={onSessionChange}/>
   <div className="ama-stats"><div><small>Network</small><b>Amadeus Testnet</b></div>
@@ -45,6 +47,7 @@ export default function AmadeusWorkspace({seed=null}){
    {balance&&<p>Raw balance response: <code>{JSON.stringify(balance)}</code></p>}
    {error&&<p role="alert" className="ama-error">{error}</p>}
   </article>
-  <AmadeusPaymentPanel identity={session} connectedWallet={wallet} seed={seed}/>
+  <AmadeusAgentPanel identity={session} connectedWallet={wallet} onDraft={setAgentSeed}/>
+  <AmadeusPaymentPanel identity={session} connectedWallet={wallet} seed={seed} agentSeed={agentSeed}/>
  </section>;
 }

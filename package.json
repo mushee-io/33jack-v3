@@ -19,7 +19,9 @@
     "test:m3": "node --test scripts/test-m3-payment-intents.mjs",
     "test:m3:db": "node --test scripts/test-m3-payment-db.mjs",
     "test:m4": "node --test scripts/test-m4-execution.mjs",
-    "test:m4:db": "node --test scripts/test-m4-execution-db.mjs"
+    "test:m4:db": "node --test scripts/test-m4-execution-db.mjs",
+    "test:m5": "node --test scripts/test-m5-agent.mjs",
+    "test:m5:db": "node --test scripts/test-m5-agent-db.mjs"
   },
   "dependencies": {
     "@vitejs/plugin-react": "^4.3.4",

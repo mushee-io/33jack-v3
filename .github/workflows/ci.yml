@@ -2,9 +2,9 @@ name: 33JACK V3 Testnet CI
 
 on:
   push:
-    branches: ["main", "feat/amadeus-testnet-v3", "feat/ama-v3-m1-foundation", "feat/ama-v3-m2-wallet-identity", "feat/ama-v3-m3-payment-intents", "feat/ama-v3-m4-execution-receipts"]
+    branches: ["main", "feat/amadeus-testnet-v3", "feat/ama-v3-m1-foundation", "feat/ama-v3-m2-wallet-identity", "feat/ama-v3-m3-payment-intents", "feat/ama-v3-m4-execution-receipts", "feat/ama-v3-m5-ai-financial-agent"]
   pull_request:
-    branches: ["main", "feat/amadeus-testnet-v3", "feat/ama-v3-m1-foundation", "feat/ama-v3-m2-wallet-identity", "feat/ama-v3-m3-payment-intents"]
+    branches: ["main", "feat/amadeus-testnet-v3", "feat/ama-v3-m1-foundation", "feat/ama-v3-m2-wallet-identity", "feat/ama-v3-m3-payment-intents", "feat/ama-v3-m4-execution-receipts"]
 
 permissions:
   contents: read
@@ -36,6 +36,8 @@ jobs:
         run: npm run test:m3
       - name: M4 native Testnet signed-packet and finality security tests
         run: npm run test:m4
+      - name: M5 Amadeus-native AI financial agent policy, tools and injection tests
+        run: npm run test:m5
       - name: Check Vercel function budget and routes
         run: npm run test:vercel
       - name: Build frontend
@@ -107,3 +109,39 @@ jobs:
         run: npm install --ignore-scripts
       - name: M4 PostgreSQL one-attempt execution and authenticated HTTP acceptance
         run: npm run test:m4:db
+
+  m5-disposable-postgres:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: postgres
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 15
+    env:
+      DATABASE_URL: postgres://postgres:postgres@127.0.0.1:5432/postgres
+      AMA_TESTNET_RPC_URL: https://testnet-rpc.ama.one/api
+      AMA_M5_ENABLE_EXTERNAL_AI: "false"
+      AMA_M4_ENABLE_BROADCAST: "false"
+      AMA_M4_WALLET_EXTENSION_VERIFIED: "false"
+      AMA_M4_TWO_WALLET_ACCEPTANCE_VERIFIED: "false"
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Setup Node 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Install dependencies
+        run: npm install --ignore-scripts
+      - name: M5 native financial-agent PostgreSQL and HTTP security acceptance
+        run: npm run test:m5:db

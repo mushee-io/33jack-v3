@@ -62,3 +62,14 @@ The server cryptographically verifies native Testnet signed packets, reserves on
 non-retryable broadcast attempt, and checks finality through the official Testnet SDK.
 Broadcast is disabled by default pending real wallet compatibility and two-wallet witness.
 Unit tests and mocked PostgreSQL CI do not establish a real on-chain transfer.
+
+
+## M5 — Amadeus Testnet Financial Agent (draft)
+[Native tool security, agent permissions, MCP/A2A subsets, risk analysis and acceptance](docs/M5-AMA-AGENT.md).
+
+M5 exposes signed-in, organization-scoped read-only native AMA tools and strictly
+human-reviewed payment suggestions. It stores unverified invoice notes, deterministic
+risk flags and bounded analysis tasks. Optional Groq explanations are disabled by default
+and NEVER decide, approve, sign or broadcast. MCP and A2A routes are limited session-scoped
+subsets, not full protocol-compliant independent servers. M4 broadcast release locks remain
+disabled by default. Run npm run test:m5 and npm run test:m5:db with disposable PostgreSQL.

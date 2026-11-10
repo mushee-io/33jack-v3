@@ -1,0 +1,14 @@
+.ama-m5{margin:20px 0;padding:22px;border-radius:15px;background:#0c1924;border:1px solid #36586e;color:#e9f5ff}
+.ama-m5 h3{font-size:21px;margin:8px 0}.ama-m5 h4{font-size:15px;margin:0 0 12px}
+.ama-m5 p{color:#b7ccd8;font-size:13px;line-height:1.6}
+.ama-m5-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;margin:14px 0}
+.ama-m5-grid>div,.ama-m5-output{border:1px solid #2e4c60;border-radius:13px;padding:15px}
+.ama-m5 label{display:grid;gap:7px;margin:11px 0;font-size:12px}
+.ama-m5 input,.ama-m5 textarea,.ama-m5 select{width:100%;min-width:0;border:1px solid #48647a;background:#101e2b;border-radius:9px;padding:11px;color:#eaf4fd}
+.ama-m5 button{padding:10px 13px;background:#1c4052;border:1px solid #51768a;border-radius:8px;color:#e3f5ff;cursor:pointer}
+.ama-m5 button:disabled{opacity:.45;cursor:not-allowed}
+.ama-m5-tool-list{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px}.ama-m5-tool-list button{font-size:12px}
+.ama-m5-output{margin:15px 0}.ama-m5-output code,.ama-m5-output pre{overflow-wrap:anywhere;white-space:pre-wrap;font-size:12px}
+.ama-m5-output pre{max-height:300px;overflow:auto;background:#08131c;border-radius:8px;padding:12px}
+.ama-m5-warn{border-left:3px solid #c49c62;background:#29221d;padding:11px;color:#f2d5a8!important}
+@media(max-width:850px){.ama-m5-grid{grid-template-columns:1fr}.ama-m5{padding:15px}}
