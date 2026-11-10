@@ -21,7 +21,11 @@
     "test:m4": "node --test scripts/test-m4-execution.mjs",
     "test:m4:db": "node --test scripts/test-m4-execution-db.mjs",
     "test:m5": "node --test scripts/test-m5-agent.mjs",
-    "test:m5:db": "node --test scripts/test-m5-agent-db.mjs"
+    "test:m5:db": "node --test scripts/test-m5-agent-db.mjs",
+    "test:m6": "node --test scripts/test-m6-invoice.mjs",
+    "test:m6:db": "node --test scripts/test-m6-invoice-db.mjs",
+    "test:m6:restore": "node --test scripts/test-m6-restore.mjs",
+    "migrate:m6": "node scripts/migrate-m6.mjs"
   },
   "dependencies": {
     "@vitejs/plugin-react": "^4.3.4",
@@ -37,7 +41,9 @@
     "@amadeus-protocol/sdk": "^1.7.0",
     "@noble/curves": "^1.9.1"
   },
-  "devDependencies": {},
+  "devDependencies": {
+    "pdf-lib": "^1.17.1"
+  },
   "overrides": {
     "uuid": "8.3.2"
   },
