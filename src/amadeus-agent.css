@@ -1,0 +1,16 @@
+.ama-agent{margin:22px 0;border:1px solid #35546a;background:#0a1924;color:#e7f3f7;border-radius:16px;padding:20px}
+.ama-agent h3{font-size:22px;margin:8px 0}.ama-agent h4{margin:0 0 13px;font-size:15px}
+.ama-agent p{font-size:13px;color:#a9c1d2;line-height:1.55}
+.ama-agent-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;margin-top:16px}
+.ama-agent-grid>div,.ama-agent-output{padding:16px;border:1px solid #2c495d;border-radius:12px}
+.ama-agent label{display:grid;gap:6px;margin:10px 0;font-size:12px}
+.ama-agent input:not([type="checkbox"]),.ama-agent select,.ama-agent textarea{width:100%;background:#0c2535;color:#eff8ff;border:1px solid #42657a;border-radius:8px;padding:10px;min-width:0}
+.ama-agent .ama-agent-check{display:flex;gap:8px;align-items:start}
+.ama-agent .ama-agent-check input{margin-top:2px}
+.ama-agent button{border:1px solid #548095;color:#effaff;background:#1a3a4e;border-radius:9px;padding:9px 12px;cursor:pointer}
+.ama-agent button:disabled{opacity:.42;cursor:not-allowed}
+.ama-agent-buttons{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+.ama-agent-output{margin-top:16px}.ama-agent-output pre{white-space:pre-wrap;overflow-wrap:anywhere;font-size:11px;max-height:450px;overflow:auto}
+.ama-agent-terms{border-left:3px solid #69adbf;padding:9px 14px}
+.ama-agent-lock{border-left:3px solid #caa568;padding:10px 14px;background:#30271f;color:#efcf9d!important}
+@media(max-width:800px){.ama-agent-grid{grid-template-columns:1fr}.ama-agent{padding:15px}}

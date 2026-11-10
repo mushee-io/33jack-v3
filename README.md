@@ -62,3 +62,16 @@ The server cryptographically verifies native Testnet signed packets, reserves on
 non-retryable broadcast attempt, and checks finality through the official Testnet SDK.
 Broadcast is disabled by default pending real wallet compatibility and two-wallet witness.
 Unit tests and mocked PostgreSQL CI do not establish a real on-chain transfer.
+
+
+## M5 — Native Amadeus Testnet AI Financial Agent (draft)
+[Detailed M5 architecture, read-only financial tools, MCP/A2A constraints and acceptance](docs/M5-AI-FINANCIAL-AGENT.md).
+
+The organization-authenticated Amadeus agent offers read-only native balance,
+allowlist, manual unverified invoice references, M3 intents, M4 execution status,
+risk scoring and natural-language human-only payment proposals.
+No agent tool may create, approve, sign or broadcast payments. Optional sanitized
+Groq explanations are OFF by default; the MCP/A2A-shaped adapters are
+authenticated local APIs, not claimed public interoperable networks.
+
+Validation: npm run test:m5, and npm run test:m5:db with disposable PostgreSQL.

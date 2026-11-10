@@ -2,6 +2,7 @@ import {AMA_TESTNET, amaHealth, amaBalance, normalizeAmaProposal, prepareAmaCall
 import identityHandler from "./v3-identity-handler.js";
 import paymentHandler from "./v3-payment-handler.js";
 import executionHandler from "./v3-execution-handler.js";
+import agentHandler from "./v3-agent-handler.js";
 
 export default async function handler(req,res) {
   res.setHeader("Cache-Control", "no-store");
@@ -10,6 +11,7 @@ export default async function handler(req,res) {
   if(op.startsWith("auth-")||op.startsWith("workspace-"))return identityHandler(req,res,op);
   if(op.startsWith("intent-")||op.startsWith("beneficiary-"))return paymentHandler(req,res,op);
   if(op.startsWith("execution-"))return executionHandler(req,res,op);
+  if(op.startsWith("agent-"))return agentHandler(req,res,op);
   try {
     if (req.method === "GET" && op === "config")
       return res.status(200).json({ok:true, network:AMA_TESTNET, custody:"user-wallet-only", status:"testnet"});

@@ -2,6 +2,7 @@ import React,{useCallback,useEffect,useState} from "react";
 import "./amadeus.css";
 import AmadeusIdentityPanel from "./AmadeusIdentityPanel.jsx";
 import AmadeusPaymentPanel from "./AmadeusPaymentPanel.jsx";
+import AmadeusAgentPanel from "./AmadeusAgentPanel.jsx";
 
 const API="/api/v3/ama";
 async function get(operation,query=""){
@@ -31,9 +32,9 @@ export default function AmadeusWorkspace({seed=null}){
   finally{setBusy(false)}
  }
  return <section className="ama-v3">
-  <header><span className="ama-eyebrow">33JACK V3 · AMADEUS TESTNET · M3</span>
+  <header><span className="ama-eyebrow">33JACK V3 · AMADEUS TESTNET · M5</span>
    <h2>AI-assisted payments, governed by your wallet.</h2>
-   <p>Prepare, verify and review exact native AMA transfers. This milestone does not sign, broadcast or reconcile transactions. No fiat off-ramp or stablecoin conversion is implied.</p>
+   <p>AI-assisted native AMA payment proposals, risk analysis and wallet-owner controls. AI tools are read-only; no AI approval, wallet signature or transaction broadcast is permitted.</p>
   </header>
   <AmadeusIdentityPanel onWalletChange={onWalletChange} onSessionChange={onSessionChange}/>
   <div className="ama-stats"><div><small>Network</small><b>Amadeus Testnet</b></div>
@@ -45,6 +46,7 @@ export default function AmadeusWorkspace({seed=null}){
    {balance&&<p>Raw balance response: <code>{JSON.stringify(balance)}</code></p>}
    {error&&<p role="alert" className="ama-error">{error}</p>}
   </article>
+  <AmadeusAgentPanel identity={session} connectedWallet={wallet}/>
   <AmadeusPaymentPanel identity={session} connectedWallet={wallet} seed={seed}/>
  </section>;
 }
