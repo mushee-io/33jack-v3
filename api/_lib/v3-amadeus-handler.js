@@ -6,6 +6,7 @@ import agentHandler from "./v3-agent-handler.js";
 import invoiceHandler from "./v3-invoice-handler.js";
 import governanceHandler from "./v3-governance-handler.js";
 import experienceHandler from "./v3-experience-handler.js";
+import acceptanceHandler from "./v3-acceptance-handler.js";
 
 export default async function handler(req,res) {
   res.setHeader("Cache-Control", "no-store");
@@ -18,6 +19,7 @@ export default async function handler(req,res) {
   if(op.startsWith("invoice-"))return invoiceHandler(req,res,op);
   if(op.startsWith("governance-"))return governanceHandler(req,res,op);
   if(op.startsWith("ux-"))return experienceHandler(req,res,op);
+  if(op.startsWith("acceptance-"))return acceptanceHandler(req,res,op);
   try {
     if (req.method === "GET" && op === "config")
       return res.status(200).json({ok:true, network:AMA_TESTNET, custody:"user-wallet-only", status:"testnet"});

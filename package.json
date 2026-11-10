@@ -32,7 +32,13 @@
     "migrate:m7": "node scripts/migrate-m7.mjs",
     "test:m8": "node --test scripts/test-m8-experience.mjs",
     "test:m8:db": "node --test scripts/test-m8-experience-db.mjs",
-    "test:m8:restore": "node --test scripts/test-m8-restore.mjs"
+    "test:m8:restore": "node --test scripts/test-m8-restore.mjs",
+    "test:m9": "node --test scripts/test-m9-acceptance.mjs",
+    "test:m9:security": "node --test scripts/test-m9-security.mjs",
+    "test:m9:db": "node --test scripts/test-m9-acceptance-db.mjs",
+    "test:m9:restore": "node --test scripts/test-m9-restore.mjs",
+    "migrate:m9": "node scripts/migrate-m9.mjs",
+    "m9:ci-report": "node scripts/m9-ci-report.mjs"
   },
   "dependencies": {
     "@vitejs/plugin-react": "^4.3.4",

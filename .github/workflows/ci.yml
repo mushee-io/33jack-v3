@@ -2,9 +2,9 @@ name: 33JACK V3 Testnet CI
 
 on:
   push:
-    branches: ["main", "feat/amadeus-testnet-v3", "feat/ama-v3-m1-foundation", "feat/ama-v3-m2-wallet-identity", "feat/ama-v3-m3-payment-intents", "feat/ama-v3-m4-execution-receipts", "feat/ama-v3-m5-ai-agent", "feat/ama-v3-m6-invoice-reconciliation", "feat/ama-v3-m7-compliance-governance", "feat/ama-v3-m8-testnet-experience"]
+    branches: ["main", "feat/amadeus-testnet-v3", "feat/ama-v3-m1-foundation", "feat/ama-v3-m2-wallet-identity", "feat/ama-v3-m3-payment-intents", "feat/ama-v3-m4-execution-receipts", "feat/ama-v3-m5-ai-agent", "feat/ama-v3-m6-invoice-reconciliation", "feat/ama-v3-m7-compliance-governance", "feat/ama-v3-m8-testnet-experience", "feat/ama-v3-m9-e2e-security-acceptance"]
   pull_request:
-    branches: ["main", "feat/amadeus-testnet-v3", "feat/ama-v3-m1-foundation", "feat/ama-v3-m2-wallet-identity", "feat/ama-v3-m3-payment-intents", "feat/ama-v3-m4-execution-receipts", "feat/ama-v3-m5-ai-agent", "feat/ama-v3-m6-invoice-reconciliation", "feat/ama-v3-m7-compliance-governance"]
+    branches: ["main", "feat/amadeus-testnet-v3", "feat/ama-v3-m1-foundation", "feat/ama-v3-m2-wallet-identity", "feat/ama-v3-m3-payment-intents", "feat/ama-v3-m4-execution-receipts", "feat/ama-v3-m5-ai-agent", "feat/ama-v3-m6-invoice-reconciliation", "feat/ama-v3-m7-compliance-governance", "feat/ama-v3-m8-testnet-experience"]
 
 permissions:
   contents: read
@@ -44,6 +44,10 @@ jobs:
         run: npm run test:m7
       - name: M8 native network UX, verified receipts and accessibility security tests
         run: npm run test:m8
+      - name: M9 full native AMA acceptance and independent-evidence unit tests
+        run: npm run test:m9
+      - name: M9 privilege, secret, governance and source security review
+        run: npm run test:m9:security
       - name: Check Vercel function budget and routes
         run: npm run test:vercel
       - name: Build frontend
@@ -295,3 +299,67 @@ jobs:
         env:
           DATABASE_URL: postgres://postgres:postgres@127.0.0.1:5432/m8restore
         run: npm run test:m8:restore
+
+  m9-disposable-postgres:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: postgres
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 15
+    env:
+      DATABASE_URL: postgres://postgres:postgres@127.0.0.1:5432/postgres
+      AMA_TESTNET_RPC_URL: https://testnet-rpc.ama.one/api
+      AMA_M4_ENABLE_BROADCAST: "false"
+      AMA_M4_WALLET_EXTENSION_VERIFIED: "false"
+      AMA_M4_TWO_WALLET_ACCEPTANCE_VERIFIED: "false"
+      AMA_M5_ALLOW_REMOTE_AI: "false"
+      PGPASSWORD: postgres
+    steps:
+      - name: Checkout exact M9 commit
+        uses: actions/checkout@v4
+      - name: Setup Node 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Clean dependency installation
+        run: npm install --ignore-scripts
+      - name: Critical dependency vulnerability gate and redacted severity review
+        run: |
+          npm audit --omit=dev --json > m9-audit.json || true
+          node scripts/m9-dependency-audit.mjs m9-audit.json
+      - name: Repeat forward-only M9 Testnet schema migration
+        run: |
+          npm run migrate:m9
+          npm run migrate:m9
+      - name: M9 end-to-end synthetic wallet through receipt, adverse cases and HTTP boundaries
+        run: npm run test:m9:db
+      - name: Generate explicitly synthetic, redacted CI acceptance artifact
+        run: npm run m9:ci-report
+      - name: Backup and restore M2-M9 PostgreSQL into independent disposable database
+        run: |
+          pg_dump --format=custom --no-owner --no-privileges --dbname="$DATABASE_URL" --file=m9-backup.dump
+          psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -c "CREATE DATABASE m9restore;"
+          pg_restore --no-owner --no-privileges --exit-on-error --dbname="postgres://postgres:postgres@127.0.0.1:5432/m9restore" m9-backup.dump
+      - name: Verify restore, original provenance, single reservation and immutable hash chain
+        env:
+          DATABASE_URL: postgres://postgres:postgres@127.0.0.1:5432/m9restore
+        run: npm run test:m9:restore
+      - name: Retain synthetic CI evidence only (not live Testnet claims)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: m9-synthetic-ci-acceptance
+          path: m9-artifacts/m9-synthetic-acceptance.json
+          if-no-files-found: ignore
+          retention-days: 7
