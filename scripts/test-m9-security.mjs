@@ -8,7 +8,9 @@ import {readFileSync,existsSync} from "node:fs";
 const read=p=>readFileSync(new URL("../"+p,import.meta.url),"utf8");
 test("M9 security boundary static checks: V2 isolation, no new spend tool, locks intact",()=>{
  const legacy=read("api/_lib/legacy-access.js");
- assert.match(legacy,/V3_LEGACY_ROUTE_DISABLED/);
+ assert.match(legacy,/retiredLegacyRoute/);
+ const legacyPolicy=read("api/_lib/v3-network-policy.js");
+ assert.match(legacyPolicy,/V3_LEGACY_ROUTE_DISABLED/);
  const m4=read("api/_lib/v3-execution-handler.js");
  for(const key of ["AMA_M4_ENABLE_BROADCAST","AMA_M4_WALLET_EXTENSION_VERIFIED",
   "AMA_M4_TWO_WALLET_ACCEPTANCE_VERIFIED"])assert.match(m4,new RegExp(key));

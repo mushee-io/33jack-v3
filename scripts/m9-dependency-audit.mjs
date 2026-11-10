@@ -14,7 +14,13 @@ if(!v||!Number.isInteger(v.critical)||!Number.isInteger(v.high)||
 }
 const counts={critical:v.critical,high:v.high,moderate:v.moderate||0,
  low:v.low||0,info:v.info||0,total:v.total||0};
-console.log("M9 dependency audit severity counts (names/redacted):",JSON.stringify(counts));
+console.log("M9 dependency audit severity counts:",JSON.stringify(counts));
+const findings=Object.entries(body.vulnerabilities||{}).filter(([name,advisory])=>
+ ["critical","high"].includes(advisory?.severity)).map(([name,advisory])=>({
+ name,severity:advisory.severity,fixAvailable:advisory.fixAvailable,
+ direct:advisory.isDirect,range:advisory.range
+}));
+console.log("M9 critical/high dependency package names and fixability (no credentials):",JSON.stringify(findings));
 if(v.critical>0){
  console.error("M9 critical vulnerability gate FAILED. Resolve before considering release.");
  process.exit(1);
