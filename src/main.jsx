@@ -16,7 +16,7 @@ function Landing() {
   return (
     <main>
       <iframe
-        src="/medusa-jf4.html"
+        src="/medusa-jf4.html?v=2"
         title="Medusa JF-4 field simulator"
         style={{ display: "block", width: "100%", height: "100svh", border: 0 }}
       />

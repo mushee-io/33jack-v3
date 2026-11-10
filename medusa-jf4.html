@@ -8,14 +8,6 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-<script type="importmap">
-{
-  "imports": {
-    "three": "https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js",
-    "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/"
-  }
-}
-</script>
 <style>
 :root{--bg:#f1fbfa;--bg2:#e3f4f3;--ink:#0e3a3d;--mid:#5d8284;--faint:#9dbcbc;--line:#d3e8e7;--coral:#ff5a3c;--teal:#0f9d8a;--aqua:#46c9bf;--card:rgba(255,255,255,.72)}
 *{box-sizing:border-box;margin:0;padding:0}
@@ -23,7 +15,11 @@ html{font-size:min(.78125vw,1.3889vh)}
 html,body{height:100%;overflow:hidden;background:var(--bg)}
 body{font-family:'JetBrains Mono',ui-monospace,monospace;color:var(--ink);-webkit-font-smoothing:antialiased;user-select:none}
 .page{position:fixed;inset:0;background:radial-gradient(90% 80% at 50% 42%,#fafefd 0%,var(--bg) 55%,var(--bg2) 100%)}
-#gl{position:absolute;inset:0;width:100%;height:100%;display:block;cursor:grab;touch-action:none}
+#gl,#gl-fallback{position:absolute;inset:0;width:100%;height:100%;display:block}
+#gl{cursor:grab;touch-action:none}
+#gl[data-renderer="2d"]{opacity:0}
+#gl-fallback{pointer-events:none}
+#gl-fallback[hidden]{display:none}
 #gl.drag{cursor:grabbing}
 #leaders{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
 #leaders line{stroke:var(--coral);stroke-width:1}
@@ -134,6 +130,7 @@ body{font-family:'JetBrains Mono',ui-monospace,monospace;color:var(--ink);-webki
 </head>
 <body>
 <main class="page">
+  <canvas id="gl-fallback" hidden></canvas>
   <canvas id="gl"></canvas>
   <svg id="leaders"></svg>
   <div id="tags"></div>
@@ -180,6 +177,7 @@ body{font-family:'JetBrains Mono',ui-monospace,monospace;color:var(--ink);-webki
 import * as THREE from 'three';
 import {RoomEnvironment} from 'three/addons/environments/RoomEnvironment.js';
 import {mergeGeometries} from 'three/addons/utils/BufferGeometryUtils.js';
+import {createMedusaFallback} from './src/medusa-fallback.js';
 
 const DUR = 25, ARMS = 8, N = 28, $ = id => document.getElementById(id);
 const clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
@@ -234,17 +232,39 @@ const secAt = t => { let s = SECT[0]; for (const x of SECT) if (t >= x.t) s = x;
 
 /* ---------- renderer ---------- */
 const canvas = $('gl');
-const renderer = new THREE.WebGLRenderer({canvas, antialias:true, alpha:true, powerPreference:'high-performance'});
-renderer.setClearColor(0, 0);
-renderer.outputColorSpace = THREE.SRGBColorSpace;
-renderer.toneMapping = THREE.NeutralToneMapping;
-renderer.toneMappingExposure = 1.02;
-renderer.shadowMap.enabled = true;
-renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 const scene = new THREE.Scene();
-const pmrem = new THREE.PMREMGenerator(renderer);
-scene.environment = pmrem.fromScene(new RoomEnvironment(), .04).texture;
-scene.environmentIntensity = .62;
+const fallbackCanvas = $('gl-fallback');
+let renderer, fallback;
+function useFallback() {
+  renderer = null;
+  fallback ??= createMedusaFallback(fallbackCanvas);
+  fallbackCanvas.hidden = false;
+  canvas.dataset.renderer = '2d';
+}
+try {
+  const context = canvas.getContext('webgl2', {antialias:true, alpha:true});
+  if (context) {
+    renderer = new THREE.WebGLRenderer({canvas, context, antialias:true, alpha:true});
+    renderer.setClearColor(0, 0);
+    renderer.outputColorSpace = THREE.SRGBColorSpace;
+    renderer.toneMapping = THREE.NeutralToneMapping;
+    renderer.toneMappingExposure = 1.02;
+    renderer.shadowMap.enabled = true;
+    renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+    const pmrem = new THREE.PMREMGenerator(renderer);
+    const room = new RoomEnvironment();
+    scene.environment = pmrem.fromScene(room, .04).texture;
+    scene.environmentIntensity = .62;
+    room.dispose();
+    pmrem.dispose();
+  } else {
+    useFallback();
+  }
+} catch (error) {
+  console.warn('Medusa WebGL startup failed', error);
+  useFallback();
+}
+canvas.addEventListener('webglcontextlost', useFallback);
 const camera = new THREE.PerspectiveCamera(26, 1, .1, 120);
 
 const key = new THREE.DirectionalLight(0xffffff, 2.3);
@@ -542,8 +562,8 @@ function drawChart(t) {
 let W = 1, H_ = 1, slowFrames = 0, lightweightRendering = false;
 function resize() {
   W = innerWidth; H_ = innerHeight;
-  renderer.setPixelRatio(Math.min(devicePixelRatio, lightweightRendering ? .75 : 1.75));
-  renderer.setSize(W, H_, false);
+  renderer?.setPixelRatio(Math.min(devicePixelRatio, lightweightRendering ? .75 : 1.75));
+  renderer?.setSize(W, H_, false);
   camera.aspect = W / H_; camera.updateProjectionMatrix();
   leaders.setAttribute('viewBox', `0 0 ${W} ${H_}`);
 }
@@ -719,12 +739,20 @@ function hud(t) {
   });
 }
 
-function draw(t, wall) { apply(t, wall); renderer.render(scene, camera); hud(t); }
+function draw(t, wall) {
+  apply(t, wall);
+  if (renderer) {
+    renderer.render(scene, camera);
+  } else {
+    fallback.draw({width:W, height:H_, camera, body:jf, sleeves:P.sleeve, state:S, wake:flag('JET WAKE'), time:t});
+  }
+  hud(t);
+}
 
 function loop(now) {
   const dt = lastFrame === null ? 0 : (now - lastFrame) / 1000;
   lastFrame = now;
-  if (playing && !lightweightRendering) {
+  if (playing && renderer && !lightweightRendering) {
     slowFrames = dt > .075 ? slowFrames + 1 : 0;
     if (slowFrames >= 4) {
       lightweightRendering = true;

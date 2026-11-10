@@ -47,18 +47,19 @@
     "test:branding": "node --test scripts/test-amadeus-branding.mjs"
   },
   "dependencies": {
+    "@amadeus-protocol/sdk": "^1.7.0",
+    "@noble/curves": "^1.9.1",
     "@vitejs/plugin-react": "^4.3.4",
     "lucide-react": "^0.468.0",
     "openai": "^6.12.0",
+    "pdfjs-dist": "^6.5.438",
     "postgres": "^3.4.7",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
+    "three": "0.170.0",
     "typescript": "^5.7.2",
-    "vite": "^6.0.7",
-    "pdfjs-dist": "^6.5.438",
     "uuid": "8.3.2",
-    "@amadeus-protocol/sdk": "^1.7.0",
-    "@noble/curves": "^1.9.1"
+    "vite": "^6.0.7"
   },
   "devDependencies": {
     "pdf-lib": "^1.17.1"
