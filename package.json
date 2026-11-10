@@ -13,11 +13,10 @@
     "test:activation": "node --test scripts/test-activation.mjs",
     "test:owner": "node --test scripts/test-owner-checkout.mjs",
     "test:amadeus": "node --test scripts/test-amadeus-v3.mjs",
-    "test:isolation": "node --test scripts/test-v3-isolation.mjs"
+    "test:isolation": "node --test scripts/test-v3-isolation.mjs",
+    "test:m1": "node --test scripts/test-m1-foundation.mjs"
   },
   "dependencies": {
-    "@solana/spl-token": "^0.4.14",
-    "@solana/web3.js": "1.98.4",
     "@vitejs/plugin-react": "^4.3.4",
     "lucide-react": "^0.468.0",
     "openai": "^6.12.0",
@@ -26,16 +25,13 @@
     "react-dom": "^19.0.0",
     "typescript": "^5.7.2",
     "vite": "^6.0.7",
-    "bs58": "^6.0.0",
     "pdfjs-dist": "3.11.174",
-    "rpc-websockets": "10.0.0",
     "uuid": "8.3.2",
     "@amadeus-protocol/sdk": "^1.7.0"
   },
   "devDependencies": {},
   "overrides": {
-    "uuid": "8.3.2",
-    "rpc-websockets": "10.0.0"
+    "uuid": "8.3.2"
   },
   "license": "MIT"
 }
