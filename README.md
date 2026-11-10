@@ -54,3 +54,11 @@ immutable terms fingerprint. M3 does not sign, broadcast or settle a payment.
 The old unauthenticated planning and direct-sign/submit UI have been retired.
 
 Validation: npm run test:m3 and, with a disposable PostgreSQL DB, npm run test:m3:db.
+
+
+## M4 — Native Amadeus Testnet signing and chain verification (draft)
+See [M4 implementation, safety gates and remaining live-wallet acceptance](docs/M4-EXECUTION-RECEIPTS.md).
+The server cryptographically verifies native Testnet signed packets, reserves one
+non-retryable broadcast attempt, and checks finality through the official Testnet SDK.
+Broadcast is disabled by default pending real wallet compatibility and two-wallet witness.
+Unit tests and mocked PostgreSQL CI do not establish a real on-chain transfer.

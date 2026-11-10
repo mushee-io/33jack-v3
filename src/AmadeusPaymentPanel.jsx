@@ -1,5 +1,6 @@
 import React,{useEffect,useState} from "react";
 import "./amadeus-payment.css";
+import AmadeusExecutionPanel from "./AmadeusExecutionPanel.jsx";
 
 const API="/api/v3/ama";
 const makeKey=()=>crypto.randomUUID();
@@ -170,8 +171,9 @@ export default function AmadeusPaymentPanel({identity,connectedWallet,seed}){
       {["draft","reviewed","awaiting_wallet_signature"].includes(intent.status)&&
        <button disabled={busy||!checked} onClick={()=>run(()=>transition("cancel"))}>Cancel unsigned intent</button>}
      </div>
-     <p className="ama-m3-warning">M3 does not sign, broadcast, execute, or reconcile AMA. “Awaiting wallet signature” records human review only. M4 must recheck beneficiary, expiry, payer identity, and native wallet signature immediately before broadcast.</p>
+     <p className="ama-m3-warning">M3 approval only records human review. The separate M4 execution panel requires a verified native wallet signature and fresh beneficiary/expiry checks. Never interpret review as settlement.</p>
     </section>}
+    {intent&&<AmadeusExecutionPanel intent={intent} identity={identity} connectedWallet={connectedWallet} workspaceId={workspaceId}/>}
     <section><h4>4. Workspace intent history</h4>
      <button disabled={busy} onClick={()=>run(reload)}>Refresh intents</button>
      <div className="ama-m3-list">{intents.length?intents.map(item=>
