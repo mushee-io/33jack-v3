@@ -22,8 +22,9 @@ if(process.env.GITHUB_ACTIONS==="true"){
   (base===""||base==="feat/ama-v3-m9-e2e-security-acceptance");
  const reviewedM10Successor=branch==="fix/ama-v3-native-only-experience"&&
   (base===""||base==="feat/ama-v3-m10-final-testnet-demo-grants");
- if(!originalM10&&!reviewedM10Successor)
-  throw Error("M10 preflight requires the original stacked M10 branch or its explicit Amadeus-only draft successor");
+ const mainPush=branch==="main"&&base===""&&process.env.GITHUB_EVENT_NAME==="push";
+ if(!originalM10&&!reviewedM10Successor&&!mainPush)
+  throw Error("M10 preflight requires the original M10 branch, the Amadeus-only successor, or a push to main");
 }
 console.log(JSON.stringify({
  prepared:true,network:result.network,rpc:result.rpc,

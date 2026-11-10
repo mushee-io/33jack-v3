@@ -25,7 +25,7 @@
 
 ## Development and Milestones
 
-The M1–M10 migration and internal automated acceptance have been implemented on **stacked draft branches**. The M10 source branch is `feat/ama-v3-m10-final-testnet-demo-grants`, tracked in [PR #13](https://github.com/mushee-io/33jack-v3/pull/13). **The default `main` branch still contains the original application until reviewed changes are merged.** An unmerged branch is not a deployed website.
+The M1–M10 migration was developed as a stack of milestone branches. See [PR #13](https://github.com/mushee-io/33jack-v3/pull/13) for M10 and [PR #14](https://github.com/mushee-io/33jack-v3/pull/14) for the Amadeus-only public app. The source and automated tests document Testnet capabilities. Deployment and external wallet acceptance are tracked separately.
 
 Node.js 22 recommended:
 
