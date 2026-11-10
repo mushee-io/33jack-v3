@@ -90,3 +90,11 @@ high-risk maker-checker separation, immutable M3 approval-policy seals, M4 execu
 owner/admin emergency pause, two-person resume, manual suspicious-invoice/recipient holds,
 incident records and hash-linked append-only security events. Existing M5 read-only agent
 permissions and M4 broadcast locks remain unchanged. KYC/KYB/AML integrations are NOT present.
+
+
+## M8 — Native Amadeus Testnet user experience and receipt truth (draft)
+[M8 detailed UX, authentication, native chain evidence, acceptance and no-go boundaries](docs/M8-TESTNET-EXPERIENCE.md).
+
+The default V3 /app/amadeus route now renders a dedicated responsive Testnet-only workspace, with accessible navigation across identity, organization overview, payments, receipts, AI, invoices and governance. Receipt finality is shown only with previously persisted independently verified M4 evidence. Every prior M4 broadcast lock, M5 read-only agent constraint, M6 invoice-audit safeguard and M7 maker-checker/emergency control remains intact.
+
+Validation: npm run test:m8, npm run test:m8:db, then npm run test:m8:restore in independent disposable PostgreSQL.

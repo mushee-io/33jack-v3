@@ -29,7 +29,10 @@
     "test:m7": "node --test scripts/test-m7-governance.mjs",
     "test:m7:db": "node --test scripts/test-m7-governance-db.mjs",
     "test:m7:restore": "node --test scripts/test-m7-restore.mjs",
-    "migrate:m7": "node scripts/migrate-m7.mjs"
+    "migrate:m7": "node scripts/migrate-m7.mjs",
+    "test:m8": "node --test scripts/test-m8-experience.mjs",
+    "test:m8:db": "node --test scripts/test-m8-experience-db.mjs",
+    "test:m8:restore": "node --test scripts/test-m8-restore.mjs"
   },
   "dependencies": {
     "@vitejs/plugin-react": "^4.3.4",

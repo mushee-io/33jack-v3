@@ -38,7 +38,7 @@ function formatSignature(raw){
  throw Error("Wallet returned an unsupported signature format.");
 }
 
-export default function AmadeusIdentityPanel({onWalletChange,onSessionChange}){
+export default function AmadeusIdentityPanel({onWalletChange,onSessionChange,onNetworkVerification}){
  const [account,setAccount]=useState("");
  const [session,setSession]=useState(null);
  const [csrf,setCsrf]=useState("");
@@ -54,7 +54,7 @@ export default function AmadeusIdentityPanel({onWalletChange,onSessionChange}){
  const [info,setInfo]=useState("");
  useEffect(()=>{
   let alive=true;
-  call("auth-session").then(x=>{if(!alive)return;setSession(x);setCsrf(x.csrf);setAccount(x.address);setWorkspaces(x.workspaces||[]);onWalletChange?.(x.address);onSessionChange?.(x)})
+  call("auth-session").then(x=>{if(!alive)return;onNetworkVerification?.(false);setSession(x);setCsrf(x.csrf);setAccount(x.address);setWorkspaces(x.workspaces||[]);onWalletChange?.(x.address);onSessionChange?.(x)})
    .catch(()=>{});
   return()=>{alive=false};
  },[]);
@@ -62,7 +62,7 @@ export default function AmadeusIdentityPanel({onWalletChange,onSessionChange}){
   const provider=window.amadeus;
   const invalidated=()=>{
    if(session&&csrf)call("auth-logout",{body:{logout:true},csrf}).catch(()=>{});
-   setAccount("");setSession(null);setCsrf("");setWorkspaces([]);onSessionChange?.(null);
+   onNetworkVerification?.(false);setAccount("");setSession(null);setCsrf("");setWorkspaces([]);onSessionChange?.(null);
    onWalletChange?.("");
    setInfo("Account or network changed. Reconnect and authenticate.");
   };
@@ -95,7 +95,7 @@ export default function AmadeusIdentityPanel({onWalletChange,onSessionChange}){
   if(!address||typeof address!=="string"||address.startsWith("0x"))
    throw Error("Wallet did not return a native Amadeus address.");
   await checkWalletNetwork(provider);
-  setAccount(address);onWalletChange?.(address);
+  onNetworkVerification?.(true);setAccount(address);onWalletChange?.(address);
   setSession(null);setCsrf("");setWorkspaces([]);onSessionChange?.(null);
   setInfo("Native Testnet wallet connected. You are not yet authenticated.");
  }
@@ -111,6 +111,7 @@ export default function AmadeusIdentityPanel({onWalletChange,onSessionChange}){
   // No signTransaction fallback: login must not move funds or create a chain transaction.
   const result=await provider.signMessage(challenge.message);
   await checkWalletNetwork(provider);
+  onNetworkVerification?.(true);
   const signature=formatSignature(result);
   const data=await call("auth-verify",{body:{id:challenge.id,address:account,signature}});
   if(data.address!==account)throw Error("Wallet identity mismatch.");
@@ -120,7 +121,7 @@ export default function AmadeusIdentityPanel({onWalletChange,onSessionChange}){
  async function logout(){
   if(session&&csrf)await call("auth-logout",{body:{logout:true},csrf});
   window.amadeus?.disconnect?.();
-  setSession(null);setCsrf("");setWorkspaces([]);setAccount("");onSessionChange?.(null);
+  onNetworkVerification?.(false);setSession(null);setCsrf("");setWorkspaces([]);setAccount("");onSessionChange?.(null);
   onWalletChange?.("");
   setInfo("Local wallet identity disconnected and session revoked.");
  }

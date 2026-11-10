@@ -2,9 +2,9 @@ name: 33JACK V3 Testnet CI
 
 on:
   push:
-    branches: ["main", "feat/amadeus-testnet-v3", "feat/ama-v3-m1-foundation", "feat/ama-v3-m2-wallet-identity", "feat/ama-v3-m3-payment-intents", "feat/ama-v3-m4-execution-receipts", "feat/ama-v3-m5-ai-agent", "feat/ama-v3-m6-invoice-reconciliation", "feat/ama-v3-m7-compliance-governance"]
+    branches: ["main", "feat/amadeus-testnet-v3", "feat/ama-v3-m1-foundation", "feat/ama-v3-m2-wallet-identity", "feat/ama-v3-m3-payment-intents", "feat/ama-v3-m4-execution-receipts", "feat/ama-v3-m5-ai-agent", "feat/ama-v3-m6-invoice-reconciliation", "feat/ama-v3-m7-compliance-governance", "feat/ama-v3-m8-testnet-experience"]
   pull_request:
-    branches: ["main", "feat/amadeus-testnet-v3", "feat/ama-v3-m1-foundation", "feat/ama-v3-m2-wallet-identity", "feat/ama-v3-m3-payment-intents", "feat/ama-v3-m4-execution-receipts", "feat/ama-v3-m5-ai-agent", "feat/ama-v3-m6-invoice-reconciliation"]
+    branches: ["main", "feat/amadeus-testnet-v3", "feat/ama-v3-m1-foundation", "feat/ama-v3-m2-wallet-identity", "feat/ama-v3-m3-payment-intents", "feat/ama-v3-m4-execution-receipts", "feat/ama-v3-m5-ai-agent", "feat/ama-v3-m6-invoice-reconciliation", "feat/ama-v3-m7-compliance-governance"]
 
 permissions:
   contents: read
@@ -42,6 +42,8 @@ jobs:
         run: npm run test:m6
       - name: M7 native AMA policy, maker-checker and audit security unit tests
         run: npm run test:m7
+      - name: M8 native network UX, verified receipts and accessibility security tests
+        run: npm run test:m8
       - name: Check Vercel function budget and routes
         run: npm run test:vercel
       - name: Build frontend
@@ -247,3 +249,49 @@ jobs:
         env:
           DATABASE_URL: postgres://postgres:postgres@127.0.0.1:5432/m7restore
         run: npm run test:m7:restore
+
+  m8-disposable-postgres:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: postgres
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 15
+    env:
+      DATABASE_URL: postgres://postgres:postgres@127.0.0.1:5432/postgres
+      AMA_TESTNET_RPC_URL: https://testnet-rpc.ama.one/api
+      AMA_M4_ENABLE_BROADCAST: "false"
+      AMA_M4_WALLET_EXTENSION_VERIFIED: "false"
+      AMA_M4_TWO_WALLET_ACCEPTANCE_VERIFIED: "false"
+      AMA_M5_ALLOW_REMOTE_AI: "false"
+      PGPASSWORD: postgres
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Setup Node 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Install dependencies
+        run: npm install --ignore-scripts
+      - name: M8 authenticated read-only dashboard and receipt integrity acceptance
+        run: npm run test:m8:db
+      - name: Backup and restore M2-M7 evidence into independent PostgreSQL
+        run: |
+          pg_dump --format=custom --no-owner --no-privileges --dbname="$DATABASE_URL" --file=m8-backup.dump
+          psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -c "CREATE DATABASE m8restore;"
+          pg_restore --no-owner --no-privileges --exit-on-error --dbname="postgres://postgres:postgres@127.0.0.1:5432/m8restore" m8-backup.dump
+      - name: Validate restored native AMA finality truth and historical integrity
+        env:
+          DATABASE_URL: postgres://postgres:postgres@127.0.0.1:5432/m8restore
+        run: npm run test:m8:restore
