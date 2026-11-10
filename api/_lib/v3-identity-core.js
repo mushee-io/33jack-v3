@@ -7,11 +7,11 @@ import {normalizeAmaAddress,AMA_TESTNET} from "./amadeus-testnet.js";
 export const LOGIN_DST="33JACK_AMA_V3_LOGIN_BLS12381G2_XMD:SHA-256_SSWU_RO_";
 export const ROLES=Object.freeze(["owner","admin","operator","approver","viewer"]);
 const PERMISSIONS=Object.freeze({
- owner:["workspace:read","workspace:invite","workspace:roles","invoice:read","invoice:write","payment:propose","payment:approve","audit:read"],
- admin:["workspace:read","workspace:invite","invoice:read","invoice:write","payment:propose","payment:approve","audit:read"],
- operator:["workspace:read","invoice:read","invoice:write","payment:propose"],
- approver:["workspace:read","invoice:read","payment:approve"],
- viewer:["workspace:read","invoice:read"]
+ owner:["workspace:read","workspace:invite","workspace:roles","invoice:read","invoice:write","payment:read","payment:propose","payment:approve","beneficiary:read","beneficiary:manage","audit:read"],
+ admin:["workspace:read","workspace:invite","invoice:read","invoice:write","payment:read","payment:propose","payment:approve","beneficiary:read","beneficiary:manage","audit:read"],
+ operator:["workspace:read","invoice:read","invoice:write","payment:read","payment:propose","beneficiary:read"],
+ approver:["workspace:read","invoice:read","payment:read","payment:approve","beneficiary:read"],
+ viewer:["workspace:read","invoice:read","payment:read","beneficiary:read"]
 });
 export function hasPermission(role,action){return (PERMISSIONS[role]||[]).includes(action)}
 export function validateRole(role){if(!ROLES.includes(role))throw Error("Unsupported organization role");return role}

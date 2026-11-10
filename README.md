@@ -43,3 +43,14 @@ Passing unit/CI checks does **not** demonstrate a funded, on-chain Testnet trans
 ## M2 wallet identity (draft)
 
 See [M2 engineering and security acceptance notes](docs/M2-WALLET-IDENTITY.md). Native Testnet wallet login uses a server-verified signature and PostgreSQL state. Extension off-chain signing compatibility and real two-wallet acceptance remain unverified; this is not a production login deployment.
+
+
+## M3 — Native AMA Testnet payment intents (draft)
+See [Detailed M3 engineering and acceptance notes](docs/M3-PAYMENT-INTENTS.md).
+
+Native AMA payment intentions are authenticated, workspace-scoped, beneficiary-allowlisted,
+idempotent, capped, time-bound and stored in PostgreSQL. A human review is bound to an
+immutable terms fingerprint. M3 does not sign, broadcast or settle a payment.
+The old unauthenticated planning and direct-sign/submit UI have been retired.
+
+Validation: npm run test:m3 and, with a disposable PostgreSQL DB, npm run test:m3:db.
