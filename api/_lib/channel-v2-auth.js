@@ -16,7 +16,7 @@ export function invoiceChannelAgentId(workspaceId) {
 
 export function assertInvoiceEligibility(payment, acknowledgements = {}) {
   if (!payment || !["analyzed", "failed"].includes(String(payment.status || ""))) {
-    throw Object.assign(new Error("Invoice is not eligible for a new Celo payment"), { status: 409 });
+    throw Object.assign(new Error("Invoice is not eligible for a new AMA payment"), { status: 409 });
   }
   const risk = payment.risk || {};
   const missing = Array.isArray(risk.missing_fields) ? risk.missing_fields.filter(Boolean) : [];
