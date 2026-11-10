@@ -41,12 +41,7 @@ import {
 import "./styles.css";
 import AmadeusWorkspace from "./AmadeusWorkspace.jsx";
 
-const samplePayments = [
-  { company: "Austin Software Inc.", invoice: "US-33018", amount: "$6,250", route: "GBP → USDG → USD", status: "Settled", time: "12 min ago" },
-  { company: "Shenzhen Nova Parts", invoice: "CN-44018", amount: "¥42,000", route: "USD → USDG → CNY", status: "Review", time: "1 hr ago" },
-  { company: "Bengaluru Cloud Services", invoice: "IN-77104", amount: "₹405,000", route: "USD → USDG → INR", status: "Settled", time: "2 hrs ago" },
-  { company: "London Creative Systems", invoice: "GB-11820", amount: "£4,850", route: "USD → USDG → GBP", status: "Review", time: "Yesterday" },
-];
+const samplePayments = []; // Do not display invented payment history.
 
 const nav = [
   ["Overview", LayoutDashboard],
@@ -2978,11 +2973,11 @@ function App() {
           </section>
 
           <section className="app-trusted">
-            <p>Built across the rails and infrastructure 33JACK uses today.</p>
+            <p>Amadeus Testnet migration — infrastructure and integrations in development.</p>
             <div className="app-trusted-marquee">
               <div className="app-trusted-track">
                 {Array.from({ length: 4 }).flatMap((_, repeat) =>
-                  ["Celo", "USDC", "USDT", "Solana", "Wise", "USDG", "Telegram", "Groq", "Neon", "Vercel", "Wallets", "Global payouts"].map((item, i) => (
+                  ["Amadeus", "AMA Testnet", "AI agents", "Wallet custody", "Telegram", "Groq", "Neon", "Vercel", "Invoices", "Approvals", "Onchain evidence", "Global payments"].map((item, i) => (
                     <span key={repeat + item} className={"logo-type logo-" + (i % 5)}>{item}</span>
                   ))
                 )}
@@ -2996,7 +2991,7 @@ function App() {
             <Metric label="Payment records" value={livePayments.length || "—"} sub={livePayments.length ? `${persistence} persistence` : "No live records yet"}/>
             <Metric label="Invoices analyzed" value={livePayments.filter((p) => p.status).length || "—"} sub="Stored payment workflow records"/>
             <Metric label="Risk flags" value={flaggedCount || "—"} sub="Duplicate / beneficiary / suspicious"/>
-            <Metric label="Settled" value={settledCount || "—"} sub="Devnet + safe demo settlements"/>
+            <Metric label="Settled" value={settledCount || "—"} sub="Verified settlements only"/>
           </section>
 
           <section className="panel-grid">
@@ -3016,9 +3011,9 @@ function App() {
             </div>
             <div className="card agent-card">
               <div className="agent-title"><div className="agent-glow"><Bot size={23}/></div><div><span className="eyebrow">33JACK AGENT</span><h3>Finance work, already prepared.</h3></div></div>
-              <div className="agent-task"><TriangleAlert size={18}/><div><b>1 beneficiary change needs review</b><p>Shenzhen Nova Parts · ¥42,000</p></div><ChevronRight size={18}/></div>
-              <div className="agent-task"><Clock3 size={18}/><div><b>3 invoices due tomorrow</b><p>£16,770 total · proposals ready</p></div><ChevronRight size={18}/></div>
-              <div className="agent-task"><BadgeCheck size={18}/><div><b>8 payments reconciled</b><p>Evidence matched automatically</p></div><ChevronRight size={18}/></div>
+              <div className="agent-task"><TriangleAlert size={18}/><div><b>No live beneficiary reviews yet</b><p>Connect a data source to populate this queue.</p></div><ChevronRight size={18}/></div>
+              <div className="agent-task"><Clock3 size={18}/><div><b>No verified upcoming payments</b><p>Connect the invoices workflow to view deadlines.</p></div><ChevronRight size={18}/></div>
+              <div className="agent-task"><BadgeCheck size={18}/><div><b>No verified reconciliations yet</b><p>Review Amadeus transaction receipts in Testnet.</p></div><ChevronRight size={18}/></div>
               <button className="agent-command" onClick={() => setFlow(true)}><Sparkles size={17}/> Ask 33jack to prepare a payment <ArrowRight size={17}/></button>
             </div>
           </section>

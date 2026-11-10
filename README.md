@@ -1,3 +1,15 @@
+# 33JACK V3 — Amadeus Testnet
+
+**Migration in progress.** This V3 branch introduces a native Amadeus Layer-1 Testnet wallet/payment path using the [official SDK](https://github.com/amadeusprotocol/amadeus-typescript-sdk) and [Amadeus Wallet extension](https://docs.ama.one/wallet/creating-a-wallet/chrome-extension-wallet/10.-integration-guide). V2 remains an independent legacy repository.
+
+**V3 workspace:** `/app/amadeus` · **API:** `/api/v3/ama` · **Implementation and safety notes:** [docs/AMADEUS-V3.md](docs/AMADEUS-V3.md) · **Licence:** [MIT](LICENSE)
+
+The original V2 application below is included only as a migration reference. Its Celo/Solana payment features and historical demos **are not evidence of Amadeus-native deployment** and must be removed or reimplemented before the complete V3 launch.
+
+---
+
+## Archived source documentation (not the V3 network specification)
+
 # 33JACK V2 | AI Financial Operations and Celo Agent Infrastructure
 
 New: MFA operator sessions, policy-guarded Celo transfers, MCP/A2A agent APIs, receipt attestations, Gmail invoice review, recurring approval queues, x402 adapter, stablecoin route quotes and SDKs. Production credentials, real low-value payments and independent security testing are still required.

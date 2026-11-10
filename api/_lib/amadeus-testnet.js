@@ -14,7 +14,7 @@ export function getAmaRpcUrl() {
   if (parsed.protocol !== "https:" || parsed.username || parsed.password || parsed.search || parsed.hash)
     throw new Error("AMA_TESTNET_RPC_URL must be an HTTPS RPC API URL");
   if (parsed.hostname === "mainnet-rpc.ama.one") throw new Error("Refusing Amadeus mainnet in V3 Testnet");
-  return value.replace(/\\/$/, "");
+  return value.replace(/\/$/, "");
 }
 
 export function getAmaClient() {
@@ -33,13 +33,13 @@ export function normalizeAmaAddress(value, label = "address") {
 
 export function parseAmaAmount(value) {
   const amount = String(value ?? "").trim();
-  if (!/^(?:0|[1-9]\\d{0,11})(?:\\.\\d{1,9})?$/.test(amount))
+  if (!/^(?:0|[1-9]\d{0,11})(?:\.\d{1,9})?$/.test(amount))
     throw new Error("AMA amount must be a positive decimal with at most 9 places");
   const [whole, fraction = ""] = amount.split(".");
   const units = BigInt(whole) * 1000000000n + BigInt(fraction.padEnd(9, "0") || "0");
   if (units <= 0n) throw new Error("AMA amount must exceed zero");
   const cap = String(process.env.AMA_TESTNET_MAX_TRANSFER || "100");
-  if (!/^[1-9]\\d{0,9}(?:\\.\\d{1,9})?$/.test(cap))
+  if (!/^[1-9]\d{0,9}(?:\.\d{1,9})?$/.test(cap))
     throw new Error("Invalid AMA_TESTNET_MAX_TRANSFER limit");
   const [maxWhole, maxFraction = ""] = cap.split(".");
   const max = BigInt(maxWhole) * 1000000000n + BigInt(maxFraction.padEnd(9, "0") || "0");
