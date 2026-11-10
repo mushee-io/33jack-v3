@@ -14,7 +14,8 @@
     "test:owner": "node --test scripts/test-owner-checkout.mjs",
     "test:amadeus": "node --test scripts/test-amadeus-v3.mjs",
     "test:isolation": "node --test scripts/test-v3-isolation.mjs",
-    "test:m1": "node --test scripts/test-m1-foundation.mjs"
+    "test:m1": "node --test scripts/test-m1-foundation.mjs",
+    "test:m2": "node --test scripts/test-m2-wallet-identity.mjs"
   },
   "dependencies": {
     "@vitejs/plugin-react": "^4.3.4",
@@ -27,7 +28,8 @@
     "vite": "^6.0.7",
     "pdfjs-dist": "3.11.174",
     "uuid": "8.3.2",
-    "@amadeus-protocol/sdk": "^1.7.0"
+    "@amadeus-protocol/sdk": "^1.7.0",
+    "@noble/curves": "^1.9.1"
   },
   "devDependencies": {},
   "overrides": {

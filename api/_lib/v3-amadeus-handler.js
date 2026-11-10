@@ -1,9 +1,11 @@
 import {AMA_TESTNET, amaHealth, amaBalance, normalizeAmaProposal, prepareAmaCall, getAmaClient} from "./amadeus-testnet.js";
+import identityHandler from "./v3-identity-handler.js";
 
 export default async function handler(req,res) {
   res.setHeader("Cache-Control", "no-store");
   res.setHeader("X-Content-Type-Options", "nosniff");
   const op = String(req.query?.operation || "config").toLowerCase();
+  if(op.startsWith("auth-")||op.startsWith("workspace-"))return identityHandler(req,res,op);
   try {
     if (req.method === "GET" && op === "config")
       return res.status(200).json({ok:true, network:AMA_TESTNET, custody:"user-wallet-only", status:"testnet"});

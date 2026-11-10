@@ -30,6 +30,8 @@ jobs:
         run: npm run test:isolation
       - name: Enforce M1 repo/network invariants
         run: npm run test:m1
+      - name: Test M2 wallet identity, BLS auth and RBAC
+        run: npm run test:m2
       - name: Check Vercel function budget and routes
         run: npm run test:vercel
       - name: Build frontend

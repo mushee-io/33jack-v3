@@ -1,6 +1,7 @@
 import React, {useEffect,useState} from "react";
 import {AmadeusSDK} from "@amadeus-protocol/sdk";
 import "./amadeus.css";
+import AmadeusIdentityPanel from "./AmadeusIdentityPanel.jsx";
 
 const API="/api/v3/ama";
 const RPC="https://testnet-rpc.ama.one/api";
@@ -53,6 +54,7 @@ export default function AmadeusWorkspace({seed=null}){
  return <section className="ama-v3">
   <header><span className="ama-eyebrow">33JACK V3 · AMADEUS TESTNET</span><h2>Native AI-agent payments, with your wallet in control.</h2>
     <p>A testnet-first payment workflow using Amadeus Coin.transfer, Base58 accounts and the Amadeus Wallet extension. No Celo, EVM transaction or automatic fiat payout.</p></header>
+  <AmadeusIdentityPanel onWalletChange={address=>{setWallet(address);setPlan(null);setReviewed(false);setBalance(null);}}/>
   <div className="ama-stats"><div><small>Network</small><b>Amadeus Testnet</b></div><div><small>RPC</small><b>{health===null?"Checking":health.reachable?"Reachable":"Unavailable"}</b></div><div><small>Asset</small><b>AMA</b></div><div><small>Custody</small><b>User wallet</b></div></div>
   <article><h3>1. Connect Amadeus Wallet</h3><p>Set the extension to Testnet and use a testnet-only wallet. Never enter a seed phrase into 33JACK.</p>
     <button onClick={connect} disabled={busy}>{wallet?wallet.slice(0,12)+"…"+wallet.slice(-8):"Connect Amadeus wallet"}</button>

@@ -38,3 +38,8 @@ npm run build
 Passing unit/CI checks does **not** demonstrate a funded, on-chain Testnet transaction. That is a separate acceptance deliverable in M4 and M9. Later milestones will replace imported frontend and backend references to legacy rails; their existence in old, unreachable modules does not mean they are available.
 
 **Source repository:** `mushee-io/33jack-v3`. **Preserved original:** `mushee-io/33jack-v2`.
+
+
+## M2 wallet identity (draft)
+
+See [M2 engineering and security acceptance notes](docs/M2-WALLET-IDENTITY.md). Native Testnet wallet login uses a server-verified signature and PostgreSQL state. Extension off-chain signing compatibility and real two-wallet acceptance remain unverified; this is not a production login deployment.
