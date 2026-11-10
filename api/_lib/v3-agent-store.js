@@ -1,6 +1,7 @@
 /** Durable, tenant-checked Amadeus Testnet agent store. No signing/approval tools. */
 import {randomUUID} from "node:crypto";
-import {paymentDB,listBeneficiaries,listIntents} from "./v3-payment-store.js";
+import {listBeneficiaries,listIntents} from "./v3-payment-store.js";
+import {executionDB} from "./v3-execution-store.js";
 import {hasPermission,nativeAddress} from "./v3-identity-core.js";
 import {assertWorkspaceId,PaymentError,sha256,assertIdempotencyKey} from "./v3-payment-core.js";
 import {parseAmaAmount,amaBalance} from "./amadeus-testnet.js";
@@ -15,7 +16,7 @@ const SCHEMA=[
  "CREATE INDEX IF NOT EXISTS ama_v3_agent_access_recent ON ama_v3_agent_access(workspace_id,actor,created_at DESC)"
 ];
 export async function agentDB(){
- const sql=await paymentDB();
+ const sql=await executionDB();
  if(!initialized)initialized=(async()=>{for(const ddl of SCHEMA)await sql.unsafe(ddl)})().catch(e=>{initialized=null;throw e});
  await initialized;return sql;
 }
