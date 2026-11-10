@@ -3108,6 +3108,11 @@ function Root() {
   if (window.location.pathname === "/") {
     window.history.replaceState({}, "", "/app/amadeus");
   }
+  // The native V3 route must not inherit legacy V2 payment-rail labels,
+  // data loaders or old multi-chain workflows. Keep V2 routes unchanged.
+  if (window.location.pathname.replace(/\/$/, "") === "/app/amadeus") {
+    return <AmadeusWorkspace/>;
+  }
   const showApp = window.location.pathname.startsWith("/app") || hasExternalReview;
   return showApp ? <App/> : <HomePage/>;
 }
