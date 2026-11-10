@@ -2,9 +2,9 @@ name: 33JACK V3 Testnet CI
 
 on:
   push:
-    branches: ["main", "feat/amadeus-testnet-v3", "feat/ama-v3-m1-foundation", "feat/ama-v3-m2-wallet-identity", "feat/ama-v3-m3-payment-intents", "feat/ama-v3-m4-execution-receipts", "feat/ama-v3-m5-ai-agent", "feat/ama-v3-m6-invoice-reconciliation", "feat/ama-v3-m7-compliance-governance", "feat/ama-v3-m8-testnet-experience", "feat/ama-v3-m9-e2e-security-acceptance", "feat/ama-v3-m10-final-testnet-demo-grants"]
+    branches: ["main", "feat/amadeus-testnet-v3", "feat/ama-v3-m1-foundation", "feat/ama-v3-m2-wallet-identity", "feat/ama-v3-m3-payment-intents", "feat/ama-v3-m4-execution-receipts", "feat/ama-v3-m5-ai-agent", "feat/ama-v3-m6-invoice-reconciliation", "feat/ama-v3-m7-compliance-governance", "feat/ama-v3-m8-testnet-experience", "feat/ama-v3-m9-e2e-security-acceptance", "feat/ama-v3-m10-final-testnet-demo-grants", "fix/ama-v3-native-only-experience"]
   pull_request:
-    branches: ["main", "feat/amadeus-testnet-v3", "feat/ama-v3-m1-foundation", "feat/ama-v3-m2-wallet-identity", "feat/ama-v3-m3-payment-intents", "feat/ama-v3-m4-execution-receipts", "feat/ama-v3-m5-ai-agent", "feat/ama-v3-m6-invoice-reconciliation", "feat/ama-v3-m7-compliance-governance", "feat/ama-v3-m8-testnet-experience", "feat/ama-v3-m9-e2e-security-acceptance"]
+    branches: ["main", "feat/amadeus-testnet-v3", "feat/ama-v3-m1-foundation", "feat/ama-v3-m2-wallet-identity", "feat/ama-v3-m3-payment-intents", "feat/ama-v3-m4-execution-receipts", "feat/ama-v3-m5-ai-agent", "feat/ama-v3-m6-invoice-reconciliation", "feat/ama-v3-m7-compliance-governance", "feat/ama-v3-m8-testnet-experience", "feat/ama-v3-m9-e2e-security-acceptance", "feat/ama-v3-m10-final-testnet-demo-grants"]
 
 permissions:
   contents: read
@@ -56,6 +56,8 @@ jobs:
         run: npm run test:m9:security
       - name: M10 privacy-safe grant snapshot, fail-closed release and accessible operator UI
         run: npm run test:m10
+      - name: Enforce Amadeus-only public branding, routes and MIT licence
+        run: npm run test:branding
       - name: M10 official native Testnet and protected Preview preparation
         run: npm run m10:preflight
       - name: Check Vercel function budget and routes

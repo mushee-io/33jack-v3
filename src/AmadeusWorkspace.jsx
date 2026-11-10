@@ -114,7 +114,7 @@ export default function AmadeusWorkspace({seed=null}){
    <div><small>Wallet status</small><strong>{state.message}</strong></div>
   </div>
   <div className="ama-m8-shell-status">
-   <span>Connection to an RPC is not proof of a completed transfer. This is <strong>Amadeus L1 Testnet</strong>, not Stellar, Celo or an EVM network.</span>
+   <span>Connection to the native Amadeus Testnet RPC alone is not proof of a completed transfer. A real wallet-authorized transaction needs independently verified finality.</span>
    <button type="button" className="ama-m8-text-link" onClick={refreshHealth} disabled={healthBusy}>
     {healthBusy?"Checking RPC…":"Recheck RPC"}</button>
   </div>
