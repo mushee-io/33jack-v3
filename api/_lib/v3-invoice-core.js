@@ -83,7 +83,7 @@ export async function extractDocument(input,{pdfLoader}={}){
   state="text_extracted_unverified";
  }else if(uploaded.format==="pdf"){
   try{
-   const pdfjs=pdfLoader?await pdfLoader():await import("pdfjs-dist/legacy/build/pdf.js");
+   const pdfjs=pdfLoader?await pdfLoader():await import("pdfjs-dist/legacy/build/pdf.mjs");
    const lib=pdfjs.getDocument?pdfjs:pdfjs.default;
    const task=lib.getDocument({
     data:new Uint8Array(uploaded.bytes),useSystemFonts:false,
