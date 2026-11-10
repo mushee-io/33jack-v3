@@ -2,9 +2,9 @@ name: 33JACK V3 Testnet CI
 
 on:
   push:
-    branches: ["main", "feat/amadeus-testnet-v3", "feat/ama-v3-m1-foundation"]
+    branches: ["main", "feat/amadeus-testnet-v3", "feat/ama-v3-m1-foundation", "feat/ama-v3-m2-wallet-identity"]
   pull_request:
-    branches: ["main", "feat/amadeus-testnet-v3"]
+    branches: ["main", "feat/amadeus-testnet-v3", "feat/ama-v3-m1-foundation"]
 
 permissions:
   contents: read
