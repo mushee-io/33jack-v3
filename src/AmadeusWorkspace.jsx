@@ -10,6 +10,7 @@ import AmadeusInvoicesPanel from "./AmadeusInvoicesPanel.jsx";
 import AmadeusGovernancePanel from "./AmadeusGovernancePanel.jsx";
 import AmadeusExperiencePanel from "./AmadeusExperiencePanel.jsx";
 import AmadeusAcceptancePanel from "./AmadeusAcceptancePanel.jsx";
+import AmadeusDemoPanel from "./AmadeusDemoPanel.jsx";
 import AmadeusReceiptsPanel from "./AmadeusReceiptsPanel.jsx";
 
 const API="/api/v3/ama";
@@ -83,7 +84,7 @@ export default function AmadeusWorkspace({seed=null}){
   <header className="ama-m8-hero">
    <div className="ama-m8-hero-top">
     <div className="ama-m8-brand"><span className="ama-m8-brand-symbol" aria-hidden="true">33</span>
-     <span>33JACK <small>V3 · M9</small></span></div>
+     <span>33JACK <small>V3 · M10</small></span></div>
     <span className="ama-m8-net-chip"><span className="ama-m8-net-dot" aria-hidden="true"/> AMADEUS L1 TESTNET</span>
    </div>
    <div className="ama-m8-hero-body">
@@ -132,7 +133,8 @@ export default function AmadeusWorkspace({seed=null}){
   </nav>
   <main id="ama-m8-content" className="ama-m8-content" tabIndex={-1}>
    {active==="overview"&&<><AmadeusExperiencePanel identity={session} connectedWallet={wallet} onNavigate={changeSection}/>
-    {authenticated&&<AmadeusAcceptancePanel identity={session} connectedWallet={wallet}/>}</>}
+    {authenticated&&<AmadeusAcceptancePanel identity={session} connectedWallet={wallet}/>}
+    {authenticated&&<AmadeusDemoPanel identity={session} connectedWallet={wallet}/>}</>}
    {active==="wallet"&&<div className="ama-m8-wallet-content">
     <div className="ama-m8-section-head"><div>
      <span className="ama-eyebrow">NATIVE WALLET · NO SERVER-SIDE CUSTODY</span>

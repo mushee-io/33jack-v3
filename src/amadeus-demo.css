@@ -1,0 +1,24 @@
+.ama-m10{background:#0c1e2b;border:1px solid #3e6676;border-radius:15px;color:#edf9ff;padding:20px;margin:18px 0}
+.ama-m10 *,.ama-m10 *::before,.ama-m10 *::after{box-sizing:border-box}
+.ama-m10-heading{display:flex;align-items:start;justify-content:space-between;flex-wrap:wrap;gap:14px}
+.ama-m10 h2{font-size:clamp(22px,3vw,30px);letter-spacing:-.025em;margin:9px 0}
+.ama-m10 h3{font-size:16px;margin:20px 0 8px}
+.ama-m10 p{font-size:12px;line-height:1.6;color:#b4ced7;max-width:770px}
+.ama-m10-no-go{display:inline-flex;align-items:center;gap:8px;font-size:11px;border:1px solid #9b7057;color:#f4c9aa;padding:8px 12px;border-radius:40px}
+.ama-m10 label{display:grid;gap:7px;margin:15px 0;font-size:12px;max-width:650px}
+.ama-m10 select{border-radius:9px;border:1px solid #4e7789;padding:10px;color:#f0faff;background:#133044;min-height:44px}
+.ama-m10-buttons{display:flex;flex-wrap:wrap;gap:10px}
+.ama-m10 button{min-height:44px;border:1px solid #a0d8c6;background:#a1ddc8;color:#092927;border-radius:9px;padding:10px 14px;display:inline-flex;gap:8px;align-items:center;justify-content:center;font-size:12px;font-weight:750}
+.ama-m10 button.ama-m10-outline{background:transparent;color:#e1f7fc;border-color:#527c8c}
+.ama-m10 button:disabled{opacity:.45;cursor:not-allowed}
+.ama-m10 button:focus-visible,.ama-m10 select:focus-visible{outline:3px solid #9ee1c4;outline-offset:3px}
+.ama-m10-result{border:1px solid #325a6a;border-radius:12px;padding:14px;margin:16px 0;background:#112c37}
+.ama-m10-result-header{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;color:#f5d4b3}
+.ama-m10-result-header strong{font-size:12px}.ama-m10-result-header span{font-size:11px;color:#add7ca}
+.ama-m10-result p{overflow-wrap:anywhere;display:block}.ama-m10-result code{font-size:11px;overflow-wrap:anywhere;color:#acd6ed}
+.ama-m10-result ol{padding-left:20px;display:grid;gap:9px}.ama-m10-result li{font-size:12px;line-height:1.4}.ama-m10-result li small{display:block;color:#a5bdca;margin-top:3px}
+.ama-m10-caution{border-left:3px solid #d5a67f;padding:10px;background:#302720;color:#f1d4b8!important}
+.ama-m10-empty{padding:16px;border:1px dashed #507282;border-radius:10px}
+.ama-m10-notice{color:#b6e6d4!important}.ama-m10-error{color:#ffd3b8!important}
+@media(max-width:650px){.ama-m10{padding:13px}.ama-m10-buttons button{width:100%}}
+@media(prefers-reduced-motion:reduce){.ama-m10 *{animation-duration:.01ms!important;transition-duration:.01ms!important}}

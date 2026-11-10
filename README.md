@@ -110,3 +110,18 @@ security/finance workflows with synthetic-only transfer evidence and an
 independent PostgreSQL restore. Neither passing CI nor a fixture is a funded
 two-wallet chain witness. Third-party security review remains NOT SUBMITTED;
 mainnet and default M4 broadcast remain NO-GO.
+
+
+## M10 — Final Amadeus Testnet demo and grant-readiness (stacked draft)
+- [Native Testnet demo operator playbook](docs/M10-DEMO-OPERATOR-PLAYBOOK.md)
+- [AMA Foundation Early Builders application draft](docs/M10-AMA-FOUNDATION-APPLICATION.md)
+- [Protected Preview preparation, not a deployment](docs/M10-TESTNET-DEPLOYMENT-PREPARATION.md)
+- [Security status and external release blockers](docs/M10-SECURITY-AND-RELEASE-GATES.md)
+- [SHA-256 evidence export format](docs/M10-REDUCTED-EVIDENCE-FORMAT.md)
+
+M10 adds an owner/admin-only read-only grant snapshot in Overview. The
+manifest never includes raw wallet addresses, transaction hashes, invoices
+or signing keys. CI repeats synthetic M9 acceptance and verifies an independent
+PostgreSQL restore. Passing CI is NOT a funded Testnet transfer, external
+security approval, Vercel protection witness, AMA grant award or mainnet GO.
+All stacked PRs remain draft/unmerged; M4 broadcasting remains disabled by default.
