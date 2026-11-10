@@ -5,7 +5,7 @@ import {ensureAgentPolicyStore,evaluateAgentPolicy} from "./agent-policy.js";
 let client;
 let initialized;
 function db() {
-  if (!process.env.DATABASE_URL) throw new Error("DATABASE_URL is required for Celo V2; in-memory settlement is disabled");
+  if (!process.env.DATABASE_URL) throw new Error("DATABASE_URL is required for AMA V2; in-memory settlement is disabled");
   if (!client) client = postgres(process.env.DATABASE_URL, { max: 3, idle_timeout: 20, connect_timeout: 8 });
   return client;
 }
