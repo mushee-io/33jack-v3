@@ -578,7 +578,7 @@ function compactStatus(payments = []) {
     ["analyzed", "approved", "settling", "failed"].includes(String(p.status || ""))
   );
   const settled = payments.filter((p) =>
-    ["settled_demo", "settled_devnet", "settled_celo"].includes(String(p.status || ""))
+    ["settled_demo", "settled_devnet", "settled_ama"].includes(String(p.status || ""))
   );
   const flagged = payments.filter((p) =>
     p.risk?.duplicate ||
@@ -683,7 +683,7 @@ export async function sendWhatsAppPaymentReceipt({ payment, whatsappUserId, base
     return { ok: true, idempotent: false, suppressed: true };
   }
 
-  if (!["settled_demo", "settled_devnet", "settled_celo"].includes(String(payment.status || ""))) {
+  if (!["settled_demo", "settled_devnet", "settled_ama"].includes(String(payment.status || ""))) {
     throw new Error(`Payment is not settled yet (current status: ${payment.status || "unknown"})`);
   }
 
@@ -697,8 +697,8 @@ export async function sendWhatsAppPaymentReceipt({ payment, whatsappUserId, base
   const amount = payment.source_amount && payment.source_currency
     ? `${payment.source_currency} ${Number(payment.source_amount).toLocaleString()}`
     : "—";
-  const status = payment.status === "settled_celo" ? "Settled on Celo Mainnet" :
-    payment.status === "settled_devnet" ? "Settled on Solana Devnet" : "Settled in controlled demo";
+  const status = payment.status === "settled_ama" ? "Settled on Amadeus Testnet" :
+    payment.status === "settled_devnet" ? "Settled on Amadeus Testnet" : "Settled in controlled demo";
 
   const lines = [
     "33Jack payment complete",
@@ -708,7 +708,7 @@ export async function sendWhatsAppPaymentReceipt({ payment, whatsappUserId, base
     `Invoice amount: ${amount}`,
     `Destination: ${payment.destination_amount || payment.destination_currency || "—"}`,
     `Status: ${status}`,
-    payment.approval?.celo ? `Celo settlement: ${payment.approval.celo.amount} ${payment.approval.celo.token}` : null,
+    payment.approval?.ama ? `AMA settlement: ${payment.approval.ama.amount} ${payment.approval.ama.token}` : null,
     "Reconciled: ✓",
     payment.settlement_signature ? `Reference: ${payment.settlement_signature}` : null
   ].filter(Boolean);
@@ -716,11 +716,11 @@ export async function sendWhatsAppPaymentReceipt({ payment, whatsappUserId, base
   if (payment.status === "settled_devnet" && payment.settlement_signature) {
     lines.push(
       "",
-      `Solana Explorer: https://explorer.solana.com/tx/${payment.settlement_signature}?cluster=devnet`
+      `Amadeus Explorer: https://explorer.amadeus.com/tx/${payment.settlement_signature}?cluster=devnet`
     );
   }
-  if (payment.status === "settled_celo" && payment.settlement_signature) {
-    lines.push("", `Celo Explorer: https://celoscan.io/tx/${payment.settlement_signature}`);
+  if (payment.status === "settled_ama" && payment.settlement_signature) {
+    lines.push("", `AMA Explorer: https://amascan.io/tx/${payment.settlement_signature}`);
   }
   if (base) lines.push("", `Open 33Jack: ${base}`);
 
@@ -1205,7 +1205,7 @@ export async function handleWhatsAppWebhook(req, res, rawBody) {
         );
 
         const reviewUrl = signedReviewUrl(base, analysis, from, workspace.id);
-        await sendReviewLink(from, invoiceSummary(analysis) + (reviewUrl ? "\n\nCelo wallet checkout: " + reviewUrl.replace("/?channel=", "/app/celo?channel=") : ""), reviewUrl);
+        await sendReviewLink(from, invoiceSummary(analysis) + (reviewUrl ? "\n\nAMA wallet checkout: " + reviewUrl.replace("/?channel=", "/app/ama?channel=") : ""), reviewUrl);
         continue;
       }
 
@@ -1220,7 +1220,7 @@ export async function handleWhatsAppWebhook(req, res, rawBody) {
       if (reviewRequested && referenced) {
         const blockers = paymentReviewBlockers(referenced);
         const state = String(referenced.status || "");
-        if (["settled_demo", "settled_devnet", "settled_celo"].includes(state)) {
+        if (["settled_demo", "settled_devnet", "settled_ama"].includes(state)) {
           await sendText(
             from,
             `${referenced.supplier || "This invoice"} is already settled. Reference: ${referenced.invoice_number || referenced.invoice_name || referenced.id}.`
@@ -1242,7 +1242,7 @@ export async function handleWhatsAppWebhook(req, res, rawBody) {
           : "\n\nNo active deterministic risk flag is currently recorded.";
         await sendReviewLink(
           from,
-          `${answer.text}${riskLine}\n\nInvoice: ${referenced.invoice_number || referenced.invoice_name || referenced.id}${reviewUrl ? "\n\nCelo wallet checkout: " + reviewUrl.replace("/?channel=", "/app/celo?channel=") : ""}`,
+          `${answer.text}${riskLine}\n\nInvoice: ${referenced.invoice_number || referenced.invoice_name || referenced.id}${reviewUrl ? "\n\nAMA wallet checkout: " + reviewUrl.replace("/?channel=", "/app/ama?channel=") : ""}`,
           reviewUrl
         );
         await addAuditEvent(
