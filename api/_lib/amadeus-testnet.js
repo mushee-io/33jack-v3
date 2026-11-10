@@ -13,7 +13,8 @@ export function getAmaRpcUrl() {
   const parsed = new URL(value);
   if (parsed.protocol !== "https:" || parsed.username || parsed.password || parsed.search || parsed.hash)
     throw new Error("AMA_TESTNET_RPC_URL must be an HTTPS RPC API URL");
-  if (parsed.hostname === "mainnet-rpc.ama.one") throw new Error("Refusing Amadeus mainnet in V3 Testnet");
+  if (parsed.hostname !== "testnet-rpc.ama.one" && process.env.AMA_TESTNET_ALLOW_CUSTOM_RPC !== "true")
+    throw new Error("Only official Amadeus Testnet RPC allowed unless custom Testnet RPC explicitly enabled");
   return value.replace(/\/$/, "");
 }
 
@@ -26,7 +27,8 @@ export function normalizeAmaAddress(value, label = "address") {
   if (!/^[1-9A-HJ-NP-Za-km-z]{60,85}$/.test(address))
     throw new Error(label + " must be a native Amadeus Base58 address");
   try {
-    if (fromBase58(address).length !== 48) throw new Error("length");
+    const raw=fromBase58(address);
+    if (raw.length !== 48 || raw.every(byte=>byte===0)) throw new Error("invalid key");
   } catch { throw new Error(label + " must decode to a 48-byte Amadeus public key"); }
   return address;
 }

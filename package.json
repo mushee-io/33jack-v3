@@ -12,7 +12,8 @@
     "test:platform": "node --test scripts/test-agent-platform.mjs",
     "test:activation": "node --test scripts/test-activation.mjs",
     "test:owner": "node --test scripts/test-owner-checkout.mjs",
-    "test:amadeus": "node --test scripts/test-amadeus-v3.mjs"
+    "test:amadeus": "node --test scripts/test-amadeus-v3.mjs",
+    "test:isolation": "node --test scripts/test-v3-isolation.mjs"
   },
   "dependencies": {
     "@solana/spl-token": "^0.4.14",

@@ -3104,6 +3104,10 @@ function Root() {
     params.get("paymentId") &&
     (params.get("waToken") || params.get("wxToken"))
   );
+  // V3 opens directly on the native Amadeus Testnet workspace.
+  if (window.location.pathname === "/") {
+    window.history.replaceState({}, "", "/app/amadeus");
+  }
   const showApp = window.location.pathname.startsWith("/app") || hasExternalReview;
   return showApp ? <App/> : <HomePage/>;
 }

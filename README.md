@@ -4,7 +4,7 @@
 
 **V3 workspace:** `/app/amadeus` · **API:** `/api/v3/ama` · **Implementation and safety notes:** [docs/AMADEUS-V3.md](docs/AMADEUS-V3.md) · **Licence:** [MIT](LICENSE)
 
-The original V2 application below is included only as a migration reference. Its Celo/Solana payment features and historical demos **are not evidence of Amadeus-native deployment** and must be removed or reimplemented before the complete V3 launch.
+Old Celo payment routes under /api/v2 and imported settlement APIs fail closed while porting continues. The original V2 application below is included only as a migration reference. Its Celo/Solana payment features and historical demos **are not evidence of Amadeus-native deployment** and must be removed or reimplemented before the complete V3 launch.
 
 ---
 
