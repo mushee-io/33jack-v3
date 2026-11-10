@@ -1,7 +1,7 @@
 import {requireAgent} from "./agent-v2-auth.js";
 import {requireOperator} from "./operator-auth.js";
 import {getAgentPolicy,setAgentPolicy,evaluateAgentPolicy} from "./agent-policy.js";
-import {normalizeCeloProposal} from "./celo-v2.js";
+import {normalizeAMAProposal} from "./ama-v2.js";
 const agentIdOk=id=>/^[a-z0-9_-]{2,64}$/i.test(String(id||""));
 export default async function handler(req,res){
  res.setHeader("Cache-Control","no-store");
@@ -18,7 +18,7 @@ export default async function handler(req,res){
    const row=await getAgentPolicy(agent.agentId);return res.status(200).json({ok:true,agentId:agent.agentId,policy:row?.policy||null,updatedAt:row?.updated_at||null});
   }
   if(op==="check"&&req.method==="POST"){
-   const proposal=normalizeCeloProposal(req.body||{});
+   const proposal=normalizeAMAProposal(req.body||{});
    const policy=await getAgentPolicy(agent.agentId);
    return res.status(200).json({ok:true,check:evaluateAgentPolicy(policy?.policy,proposal)});
   }
