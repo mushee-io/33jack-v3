@@ -56,13 +56,14 @@
     "postgres": "^3.4.7",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
-    "three": "0.170.0",
     "typescript": "^5.7.2",
     "uuid": "8.3.2",
     "vite": "^6.0.7"
   },
   "devDependencies": {
-    "pdf-lib": "^1.17.1"
+    "@tailwindcss/vite": "^4.3.5",
+    "pdf-lib": "^1.17.1",
+    "tailwindcss": "^4.3.5"
   },
   "overrides": {
     "uuid": "8.3.2"

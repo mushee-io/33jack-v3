@@ -1,6 +1,7 @@
 import React from "react";
 import { createRoot } from "react-dom/client";
 import AmadeusWorkspace from "./AmadeusWorkspace.jsx";
+import MainframeHero from "./MainframeHero";
 import "./entry.css";
 
 // Legacy application URLs converge on the one native Testnet workspace.
@@ -12,20 +13,8 @@ if (pathname.startsWith("/app") && pathname !== "/app/amadeus") {
 
 const amaSeed = null;
 
-function Landing() {
-  return (
-    <main>
-      <iframe
-        src="/medusa-jf4.html?v=2"
-        title="Medusa JF-4 field simulator"
-        style={{ display: "block", width: "100%", height: "100svh", border: 0 }}
-      />
-    </main>
-  );
-}
-
 function Root() {
-  return (window.location.pathname === "/" ? <Landing/> : <AmadeusWorkspace seed={amaSeed}/>);
+  return pathname === "/" ? <MainframeHero /> : <AmadeusWorkspace seed={amaSeed}/>;
 }
 
 createRoot(document.getElementById("root")).render(<Root/>);
