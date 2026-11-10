@@ -21,7 +21,11 @@ test("M6 restored disposable PostgreSQL backup preserves provenance, invoice ter
   assert.equal(links.length,2);
   const executions=await sql.unsafe("SELECT status,receipt,tx_hash FROM ama_v3_executions WHERE workspace_id=$1",[w]);
   assert.equal(executions.length,2);
-  assert.equal(executions.every(x=>x.status==="finalized"&&x.receipt?.txHash===x.tx_hash),true);
+  assert.equal(executions.every(x=>{
+   let evidence=x.receipt;
+   for(let i=0;i<2&&typeof evidence==="string";i++)evidence=JSON.parse(evidence);
+   return x.status==="finalized"&&evidence?.txHash===x.tx_hash;
+  }),true);
   const events=await sql.unsafe("SELECT id,source_hash,event FROM ama_v3_m6_events WHERE workspace_id=$1",[w]);
   assert.equal(events.length,markers[0].expected_count);
   assert.equal(events.every(x=>/^[a-f0-9]{64}$/.test(x.source_hash)),true);

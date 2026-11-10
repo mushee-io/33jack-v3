@@ -5,7 +5,6 @@
 import {createHash} from "node:crypto";
 import {PaymentError,assertWorkspaceId,assertIntentId} from "./v3-payment-core.js";
 import {nativeAddress} from "./v3-identity-core.js";
-import {parseAmaAmount} from "./amadeus-testnet.js";
 export const M6_MAX_BYTES=1024*1024*2;
 export const M6_MAX_PDF_PAGES=8;
 export const M6_ALLOWED_CURRENCIES=Object.freeze(["AMA","GBP","USD","EUR"]);
@@ -28,7 +27,16 @@ export function invoiceReference(value){
 }
 export function moneyUnits(amount,currency){
  if(!M6_ALLOWED_CURRENCIES.includes(currency))throw new PaymentError(400,"Unsupported invoice currency");
- if(currency==="AMA")return {units:parseAmaAmount(String(amount)),kind:"ama_atomic_9"};
+ if(currency==="AMA"){
+  const raw=String(amount??"");
+  if(!/^(?:0|[1-9]\d{0,11})(?:\.\d{1,9})?$/.test(raw))
+   throw new PaymentError(400,"Native AMA invoice requires an exact decimal with up to nine places");
+  const [whole,frac=""]=raw.split(".");
+  const atomic=BigInt(whole)*1000000000n+BigInt(frac.padEnd(9,"0")||"0");
+  if(atomic<=0n)throw new PaymentError(400,"Native AMA invoice must exceed zero");
+  // Invoices may be larger than the separately enforced M3 per-transfer cap.
+  return {units:atomic.toString(),kind:"ama_atomic_9"};
+ }
  if(typeof amount!=="string"||!/^(?:0|[1-9]\d{0,11})(?:\.\d{1,2})?$/.test(amount))
   throw new PaymentError(400,"Fiat invoice must be a positive exact decimal with at most two places");
  const [whole,frac=""]=amount.split(".");
@@ -150,9 +158,9 @@ export function verifiedM4Evidence({intent,execution}){
   inclusionHeight:Number(receipt.entryHeight)};
 }
 export function deriveInvoiceSettlement({invoice,links=[]}){
- if(invoice.status!=="human_verified")return {state:"unverified",settledUnits:"0",outstandingUnits:String(invoice.amount_units),evidence:[]};
+ if(invoice.status!=="human_verified")return {state:"unverified",settledUnits:"0",outstandingUnits:String(invoice.amount_units),evidence:[],bankPayoutVerified:false,fxQuoteVerified:false};
  if(invoice.currency!=="AMA")return {state:"not_applicable",settledUnits:"0",
-  outstandingUnits:String(invoice.amount_units),evidence:[],reason:"Fiat invoices require a separate verified FX/payout workflow; no fiat payment is claimed"};
+  outstandingUnits:String(invoice.amount_units),evidence:[],bankPayoutVerified:false,fxQuoteVerified:false,reason:"Fiat invoices require a separate verified FX/payout workflow; no fiat payment is claimed"};
  const due=BigInt(String(invoice.amount_units));
  let settled=0n,pending=0,failed=0,disputed=0;
  const evidence=[];
@@ -166,7 +174,7 @@ export function deriveInvoiceSettlement({invoice,links=[]}){
   else pending++;
  }
  if(settled>due)return {state:"disputed",settledUnits:settled.toString(),outstandingUnits:"0",evidence,
-  reason:"Chain evidence exceeds invoice amount; manual investigation required"};
+  reason:"Chain evidence exceeds invoice amount; manual investigation required",bankPayoutVerified:false,fxQuoteVerified:false};
  const outstanding=due-settled;
  let state;
  if(settled===due)state="settled";

@@ -56,9 +56,10 @@ test("M6 supplier/ref/fiat amounts validated without fabricating FX",()=>{
  assert.equal(invoiceReference("  INV-01  "),"INV-01");
  assert.throws(()=>invoiceReference("=HYPERLINK(1)"),/identifier/);
  assert.equal(moneyUnits("2.345678901","AMA").units,"2345678901");
+ assert.equal(moneyUnits("250","AMA").units,"250000000000");
  assert.equal(moneyUnits("20.25","GBP").units,"2025");
  assert.equal(moneyUnits("20.2","EUR").kind,"fiat_minor_2_no_fx");
- for(const n of ["1.234","1e3","0","-3"])assert.throws(()=>moneyUnits(n,"GBP"),/positive|decimal/);
+ for(const n of ["1.234","1e3","0","-3"])assert.throws(()=>moneyUnits(n,"GBP"),/positive|decimal|exceed zero/);
  assert.throws(()=>moneyUnits("1","USDC"),/currency/);
  const supplier=validateSupplier({workspaceId,name:"Test Supplier",address:recipient});
  assert.equal(supplier.address,recipient);
