@@ -29,28 +29,31 @@
     },
     "api/v2.js": {
       "maxDuration": 30
+    },
+    "api/v3.js": {
+      "maxDuration": 30
     }
   },
   "rewrites": [
     {
       "source": "/a2a",
-      "destination": "/api/v2/a2a"
+      "destination": "/api/v3/a2a"
     },
     {
       "source": "/mcp",
-      "destination": "/api/v2/mcp"
+      "destination": "/api/v3/mcp"
     },
     {
       "source": "/.well-known/agent.json",
-      "destination": "/api/v2/a2a?operation=card"
+      "destination": "/api/v3/a2a?operation=card"
     },
     {
       "source": "/.well-known/agent-card.json",
-      "destination": "/api/v2/a2a?operation=card"
+      "destination": "/api/v3/a2a?operation=card"
     },
     {
-      "source": "/api/v2/:resource",
-      "destination": "/api/v2?resource=:resource"
+      "source": "/api/v3/:resource",
+      "destination": "/api/v3?resource=:resource"
     },
     {
       "source": "/api/payment",
@@ -83,7 +86,7 @@
   ],
   "crons": [
     {
-      "path": "/api/v2/schedule?operation=runDue",
+      "path": "/api/v3/schedule?operation=runDue",
       "schedule": "0 9 * * *"
     }
   ]
