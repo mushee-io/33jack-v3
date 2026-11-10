@@ -118,7 +118,7 @@ function compactStatus(payments = []) {
     ["analyzed", "approved", "settling", "failed"].includes(String(p.status || ""))
   );
   const settled = payments.filter((p) =>
-    ["settled_demo", "settled_devnet", "settled_celo"].includes(String(p.status || ""))
+    ["settled_demo", "settled_devnet", "settled_ama"].includes(String(p.status || ""))
   );
   const flagged = payments.filter((p) =>
     p.risk?.duplicate ||
@@ -326,20 +326,20 @@ function dashboardPayment(payment, userId, base, role) {
       amount_usdg: payment.approval?.amount_usdg == null ? null : Number(payment.approval.amount_usdg),
       signature: payment.settlement_signature || null,
       explorer: payment.status === "settled_devnet" && payment.settlement_signature
-        ? `https://explorer.solana.com/tx/${payment.settlement_signature}?cluster=devnet`
-        : payment.status === "settled_celo" && payment.settlement_signature
-          ? `https://celoscan.io/tx/${payment.settlement_signature}`
+        ? `https://explorer.amadeus.com/tx/${payment.settlement_signature}?cluster=devnet`
+        : payment.status === "settled_ama" && payment.settlement_signature
+          ? `https://amascan.io/tx/${payment.settlement_signature}`
           : null
     },
     can_create_fiat_payout:
       roleCan(role, "operate") &&
-      ["USDG", "USDC", "USDT"].includes(String(payment.source_currency || "").toUpperCase()) &&
+      ["AMA", "USDC", "USDT"].includes(String(payment.source_currency || "").toUpperCase()) &&
       ["USD", "GBP", "CNY", "INR"].includes(String(payment.destination_currency || "").toUpperCase()),
     review_url: base && launchToken
       ? `${base}/telegram.html?payment=${encodeURIComponent(payment.id)}&launch=${encodeURIComponent(launchToken)}`
       : null,
-    celo_url: base && launchToken
-      ? `${base}/app/celo?channel=telegram&paymentId=${encodeURIComponent(payment.id)}&telegramLaunchToken=${encodeURIComponent(launchToken)}`
+    ama_url: base && launchToken
+      ? `${base}/app/ama?channel=telegram&paymentId=${encodeURIComponent(payment.id)}&telegramLaunchToken=${encodeURIComponent(launchToken)}`
       : null
   };
 }
@@ -490,7 +490,7 @@ export async function sendTelegramPaymentReceipt({ payment, userId, base = "" })
     }
   }
 
-  if (!["settled_demo", "settled_devnet", "settled_celo"].includes(String(payment.status || ""))) {
+  if (!["settled_demo", "settled_devnet", "settled_ama"].includes(String(payment.status || ""))) {
     throw new Error(`Payment is not settled yet (current status: ${payment.status || "unknown"})`);
   }
 
@@ -505,8 +505,8 @@ export async function sendTelegramPaymentReceipt({ payment, userId, base = "" })
   }
 
   const settlementAmount = Number(payment.approval?.amount_usdg || 0);
-  const statusLabel = payment.status === "settled_celo" ? "Settled on Celo Mainnet" :
-    payment.status === "settled_devnet" ? "Settled on Solana Devnet" : "Settled in controlled demo";
+  const statusLabel = payment.status === "settled_ama" ? "Settled on Amadeus Testnet" :
+    payment.status === "settled_devnet" ? "Settled on Amadeus Testnet" : "Settled in controlled demo";
   const invoiceAmount = payment.source_amount && payment.source_currency
     ? `${payment.source_currency} ${Number(payment.source_amount).toLocaleString()}`
     : "—";
@@ -517,8 +517,8 @@ export async function sendTelegramPaymentReceipt({ payment, userId, base = "" })
     `Supplier: ${payment.supplier || "—"}`,
     `Invoice: ${payment.invoice_number || payment.invoice_name || payment.id}`,
     `Invoice amount: ${invoiceAmount}`,
-    payment.approval?.celo ? `Celo settlement: ${payment.approval.celo.amount} ${payment.approval.celo.token}` :
-      settlementAmount > 0 ? `Settlement amount: ${settlementAmount} USDG` : null,
+    payment.approval?.ama ? `AMA settlement: ${payment.approval.ama.amount} ${payment.approval.ama.token}` :
+      settlementAmount > 0 ? `Settlement amount: ${settlementAmount} AMA` : null,
     `Destination: ${payment.destination_amount || payment.destination_currency || "—"}`,
     `Status: ${statusLabel}`,
     "Reconciled: ✓",
@@ -528,12 +528,12 @@ export async function sendTelegramPaymentReceipt({ payment, userId, base = "" })
   const buttons = [];
   if (payment.status === "settled_devnet" && payment.settlement_signature) {
     buttons.push([{
-      text: "View Solana transaction",
-      url: `https://explorer.solana.com/tx/${payment.settlement_signature}?cluster=devnet`
+      text: "View Amadeus transaction",
+      url: `https://explorer.amadeus.com/tx/${payment.settlement_signature}?cluster=devnet`
     }]);
   }
-  if (payment.status === "settled_celo" && payment.settlement_signature) {
-    buttons.push([{ text: "View Celo transaction", url: `https://celoscan.io/tx/${payment.settlement_signature}` }]);
+  if (payment.status === "settled_ama" && payment.settlement_signature) {
+    buttons.push([{ text: "View AMA transaction", url: `https://amascan.io/tx/${payment.settlement_signature}` }]);
   }
   if (base) {
     buttons.push([{ text: "Open 33Jack", web_app: { url: dashboardUrl(base) } }]);
@@ -709,7 +709,7 @@ export async function handleTelegramMiniAppAction(req, res) {
     const payment = await getPayment(paymentId);
     if (!payment) return res.status(404).json({ error: "Payment not found" });
 
-    if (!["settled_demo", "settled_devnet", "settled_celo"].includes(String(payment.status || ""))) {
+    if (!["settled_demo", "settled_devnet", "settled_ama"].includes(String(payment.status || ""))) {
       return res.status(409).json({
         error: "Payment is not settled yet",
         detail: `Current status is ${payment.status || "unknown"}`
@@ -846,7 +846,7 @@ export async function handleTelegramWebhook(req, res) {
           ? {
               reply_markup: {
                 inline_keyboard: [[{ text: "Review & Pay", web_app: { url: miniAppUrl } }],
-                  [{ text: "Review on Celo Mainnet", web_app: { url: `${base}/app/celo?channel=telegram&paymentId=${encodeURIComponent(analysis.id)}&telegramLaunchToken=${encodeURIComponent(launchToken)}` } }]]
+                  [{ text: "Review on Amadeus Testnet", web_app: { url: `${base}/app/ama?channel=telegram&paymentId=${encodeURIComponent(analysis.id)}&telegramLaunchToken=${encodeURIComponent(launchToken)}` } }]]
               }
             }
           : {}
