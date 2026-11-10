@@ -39,13 +39,13 @@ import {
   Zap
 } from "lucide-react";
 import "./styles.css";
-import CeloWorkspace from "./CeloWorkspace.jsx";
+import AMAWorkspace from "./AMAWorkspace.jsx";
 
 const samplePayments = [
-  { company: "Austin Software Inc.", invoice: "US-33018", amount: "$6,250", route: "GBP → USDG → USD", status: "Settled", time: "12 min ago" },
-  { company: "Shenzhen Nova Parts", invoice: "CN-44018", amount: "¥42,000", route: "USD → USDG → CNY", status: "Review", time: "1 hr ago" },
-  { company: "Bengaluru Cloud Services", invoice: "IN-77104", amount: "₹405,000", route: "USD → USDG → INR", status: "Settled", time: "2 hrs ago" },
-  { company: "London Creative Systems", invoice: "GB-11820", amount: "£4,850", route: "USD → USDG → GBP", status: "Review", time: "Yesterday" },
+  { company: "Austin Software Inc.", invoice: "US-33018", amount: "$6,250", route: "GBP → AMA → USD", status: "Example", time: "12 min ago" },
+  { company: "Shenzhen Nova Parts", invoice: "CN-44018", amount: "¥42,000", route: "USD → AMA → CNY", status: "Review", time: "1 hr ago" },
+  { company: "Bengaluru Cloud Services", invoice: "IN-77104", amount: "₹405,000", route: "USD → AMA → INR", status: "Example", time: "2 hrs ago" },
+  { company: "London Creative Systems", invoice: "GB-11820", amount: "£4,850", route: "USD → AMA → GBP", status: "Review", time: "Yesterday" },
 ];
 
 const nav = [
@@ -58,7 +58,7 @@ const nav = [
   ["33Jack Crypto", Coins],
   ["33Jack Invoice", FilePlus2],
   ["Settlement Network", Globe2],
-  ["Celo Mainnet", Wallet],
+  ["AMA Testnet", Wallet],
   ["Payments", CircleDollarSign],
   ["Beneficiaries", WalletCards],
   ["Approvals", ShieldCheck],
@@ -74,7 +74,7 @@ const APP_ROUTES = {
   "33Jack Crypto": "/app/crypto",
   "33Jack Invoice": "/app/invoice",
   "Settlement Network": "/app/settlement-network",
-  "Celo Mainnet": "/app/celo",
+  "AMA Testnet": "/app/ama",
   "Payments": "/app/payments",
   "Beneficiaries": "/app/beneficiaries",
   "Approvals": "/app/approvals"
@@ -99,7 +99,7 @@ const steps = [
   ["Risk checks", "Duplicate scan, beneficiary-change check and missing-field validation.", ShieldCheck],
   ["Route prepared", "Compared settlement options and prepared an exact payment proposal.", RefreshCw],
   ["Approval", "Human approval is bound to amount, beneficiary, route and expiry.", BadgeCheck],
-  ["Settlement", "USDG settles on Solana, then the local payout partner completes delivery.", Zap],
+  ["Settlement", "AMA settles on Amadeus, then the local payout partner completes delivery.", Zap],
   ["Reconciliation", "Payment evidence is matched back to the invoice automatically.", FileCheck2],
 ];
 
@@ -110,7 +110,7 @@ const subunits = [
     description: "Fund with stablecoins, pay approved vendors in their local currency through payout partners.",
     status: "Sandbox route",
     icon: Landmark,
-    bullets: ["USDG / USDC / USDT funding", "FX + payout quote", "Local bank delivery", "Receipt + reconciliation"]
+    bullets: ["AMA / USDC / USDT funding", "FX + payout quote", "Local bank delivery", "Receipt + reconciliation"]
   },
   {
     name: "33Jack Crypto",
@@ -118,7 +118,7 @@ const subunits = [
     description: "Invoice-led wallet payouts for vendors, contractors and crypto-native teams.",
     status: "Devnet live",
     icon: Coins,
-    bullets: ["USDG on Solana", "Exact approval binding", "Wallet settlement", "Onchain proof"]
+    bullets: ["AMA on Amadeus", "Exact approval binding", "Wallet settlement", "Onchain proof"]
   },
   {
     name: "33Jack Invoice",
@@ -219,7 +219,7 @@ async function deleteStoredRecord(kind, id, label = "this record") {
   return data;
 }
 
-const STABLECOINS = new Set(["USDG", "USDC", "USDT"]);
+const STABLECOINS = new Set(["AMA", "USDC", "USDT"]);
 
 function formatMoney(value, currency) {
   const amount = Number(value);
@@ -308,7 +308,7 @@ function PaymentFlow({ close, onComplete, initialPayment = null, channelContext 
         funding: demo.funding,
         fee: "Calculated at quote",
         eta: demo.eta,
-        route: `${demo.source} → USDG/Solana → ${corridor}`,
+        route: `${demo.source} → AMA/Amadeus → ${corridor}`,
         risk: { duplicate: false, beneficiary_changed: false, suspicious: false, missing_fields: [] }
       };
     }
@@ -324,7 +324,7 @@ function PaymentFlow({ close, onComplete, initialPayment = null, channelContext 
       eta: analysis.route_options?.best?.etaMinutes
         ? `${analysis.route_options.best.etaMinutes} min est.`
         : corridor === "CNY" ? "Same business day" : "< 10 minutes",
-      route: analysis.recommended_route || `${analysis.source_currency || "GBP"} → USDG/Solana → ${analysis.destination_currency || corridor}`,
+      route: analysis.recommended_route || `${analysis.source_currency || "GBP"} → AMA/Amadeus → ${analysis.destination_currency || corridor}`,
       risk: analysis.risk || {}
     };
   }, [analysis, corridor]);
@@ -534,12 +534,12 @@ Please settle this approved supplier invoice.`;
               <div className="proposal-amount">{result.amount}</div>
               <div className="proposal-lines">
                 <p><span>You fund</span><b>{result.funding}</b></p>
-                <p><span>Settlement</span><b>Solana · USDG</b></p>
+                <p><span>Settlement</span><b>Amadeus · AMA</b></p>
                 <p><span>Service + FX</span><b>{result.fee}</b></p>
                 <p><span>Delivery target</span><b>{result.eta}</b></p>
               </div>
               <div className="route">
-                <span>{analysis?.source_currency || "GBP"}</span><ArrowRight/><span>USDG</span><ArrowRight/><span>{analysis?.destination_currency || corridor}</span>
+                <span>{analysis?.source_currency || "GBP"}</span><ArrowRight/><span>AMA</span><ArrowRight/><span>{analysis?.destination_currency || corridor}</span>
               </div>
               {duplicateKnown && (
                 <label className="ack">
@@ -583,7 +583,7 @@ Please settle this approved supplier invoice.`;
               >
                 <ShieldCheck size={17}/> Approve exact payment
               </button>
-              <small className="fine">Devnet-ready: real USDG moves only when the server devnet signer, mint and recipient are configured.</small>
+              <small className="fine">Devnet-ready: real AMA moves only when the server devnet signer, mint and recipient are configured.</small>
             </div>
           </div>
         )}
@@ -594,7 +594,7 @@ Please settle this approved supplier invoice.`;
             <h3>Executing approved payment</h3>
             {[
               "Approval locked",
-              "USDG settlement submitted on Solana",
+              "AMA settlement submitted on Amadeus",
               "Settlement response confirmed",
               "Invoice reconciled"
             ].map((s, i) => (
@@ -613,12 +613,12 @@ Please settle this approved supplier invoice.`;
             <h2>Payment complete.</h2>
             <p>{result.supplier} is linked to the settlement record and the invoice now has an auditable payment state.</p>
             <div className="receipt">
-              <div><span>Solana settlement</span><b>{settlement?.signature ? settlement.signature.slice(0, 12) + "…" : "Recorded"}</b></div>
+              <div><span>Amadeus settlement</span><b>{settlement?.signature ? settlement.signature.slice(0, 12) + "…" : "Recorded"}</b></div>
               <div><span>Invoice</span><b>{fileName || analysis?.invoice_name || "invoice"}</b></div>
-              <div><span>Mode</span><b>{settlement?.mode === "devnet" ? "Solana Devnet" : "Safe demo"}</b></div>
+              <div><span>Mode</span><b>{settlement?.mode === "devnet" ? "Amadeus Testnet" : "Safe demo"}</b></div>
               <div><span>Status</span><b className="green">Matched ✓</b></div>
             </div>
-            {settlement?.explorer && <a className="primary wide" href={settlement.explorer} target="_blank" rel="noreferrer" style={{textDecoration:"none",marginBottom:8}}>View on Solana Explorer <ArrowRight size={16}/></a>}
+            {settlement?.explorer && <a className="primary wide" href={settlement.explorer} target="_blank" rel="noreferrer" style={{textDecoration:"none",marginBottom:8}}>View on Amadeus Explorer <ArrowRight size={16}/></a>}
             <button className="secondary wide" onClick={close}>Back to dashboard</button>
           </div>
         )}
@@ -651,7 +651,7 @@ function ChannelPreview() {
           </div>
           <div className="bubble bot compact">
             <b>Payment proposal</b>
-            <p>£4,850 → USDG/Solana → ¥42,000</p>
+            <p>£4,850 → AMA/Amadeus → ¥42,000</p>
             <small>Estimated delivery: same business day</small>
           </div>
           <button className="chat-cta">Review securely <ChevronRight size={15}/></button>
@@ -885,7 +885,7 @@ function SettlementNetworkWorkspace() {
   const recommended = quote?.recommendedRoute;
   const alternatives = quote?.alternativeRoutes || [];
   const networks = health?.networks || [
-    { id: "solana", name: "Solana", mode: "devnet", status: "available", asset: "USDG / USDC" },
+    { id: "amadeus", name: "Amadeus", mode: "devnet", status: "available", asset: "AMA / USDC" },
     { id: "morph", name: "Morph", mode: "demo", status: "demo", asset: "USDC" },
     { id: "base", name: "Base", mode: "demo", status: "demo", asset: "USDC" }
   ];
@@ -910,7 +910,7 @@ function SettlementNetworkWorkspace() {
       </div>
 
       <div className="settlement-metrics">
-        <Metric label="Networks" value={networks.length} sub="Solana · Morph · Base · Celo"/>
+        <Metric label="Networks" value={networks.length} sub="Amadeus · Morph · Base · Amadeus"/>
         <Metric label="Providers" value={providers.length || 3} sub="Adapter-based registry"/>
         <Metric label="Policy" value="Deterministic" sub="LLM cannot choose or sign"/>
         <Metric label="Execution" value="Demo-safe" sub="No customer funds move"/>
@@ -1072,7 +1072,7 @@ function SettlementNetworkWorkspace() {
 
 function PayWorkspace({ seed }) {
   const [form, setForm] = useState({
-    fundingAsset: "USDG",
+    fundingAsset: "AMA",
     fundingAmount: "10000",
     destinationCurrency: "CNY",
     invoiceRef: "NXD-2026-1008",
@@ -1095,7 +1095,7 @@ function PayWorkspace({ seed }) {
     const currency = String(seed.source_currency || seed.destination_currency || "USD").toUpperCase();
     setForm((current) => ({
       ...current,
-      fundingAsset: "USDG",
+      fundingAsset: "AMA",
       fundingAmount: String(seed.source_amount || ""),
       destinationCurrency: ["USD", "GBP", "CNY", "INR"].includes(currency) ? currency : "USD",
       invoiceRef: seed.invoice_number || seed.invoice_name || seed.id,
@@ -1320,7 +1320,7 @@ function PayWorkspace({ seed }) {
           <p>33Jack builds the payout instruction, quotes FX and fees, binds approval to the exact beneficiary and amount, then runs the sandbox payout and reconciles the receipt.</p>
         </div>
         <div className="unit-flow">
-          <span>USDG / USDC / USDT</span><ArrowRight/><span>33Jack controls</span><ArrowRight/><span>FX + payout adapter</span><ArrowRight/><span>Vendor bank</span>
+          <span>AMA / USDC / USDT</span><ArrowRight/><span>33Jack controls</span><ArrowRight/><span>FX + payout adapter</span><ArrowRight/><span>Vendor bank</span>
         </div>
       </div>
 
@@ -1336,7 +1336,7 @@ function PayWorkspace({ seed }) {
           <div className="form-split">
             <label>Funding asset
               <select value={form.fundingAsset} onChange={(e) => patch("fundingAsset", e.target.value)}>
-                <option>USDG</option><option>USDC</option><option>USDT</option>
+                <option>AMA</option><option>USDC</option><option>USDT</option>
               </select>
             </label>
             <label>Funding amount
@@ -1496,15 +1496,15 @@ function CryptoWorkspace({ onNewPayment, seed }) {
           <button className="primary" onClick={onNewPayment}><Coins size={16}/>{seed ? " Continue invoice payment" : " New stablecoin payment"}</button>
         </div>
         <div className="unit-flow">
-          <span>Invoice</span><ArrowRight/><span>Risk + approval</span><ArrowRight/><span>USDG</span><ArrowRight/><span>Solana wallet</span>
+          <span>Invoice</span><ArrowRight/><span>Risk + approval</span><ArrowRight/><span>AMA</span><ArrowRight/><span>Amadeus wallet</span>
         </div>
       </div>
       <div className="unit-panels">
         <div className="card unit-panel live-panel">
           <span className="eyebrow">LIVE DEVNET RAIL</span>
-          <h3>USDG · Solana Token-2022</h3>
+          <h3>AMA · Amadeus Token-2022</h3>
           <p>Server-side signer, exact approval binding, transaction signature persistence and reconciliation are already implemented.</p>
-          <div className="rail-badges"><span>USDG</span><span>Solana Devnet</span><span>Token-2022</span><span>Explorer proof</span></div>
+          <div className="rail-badges"><span>AMA</span><span>Amadeus Testnet</span><span>Token-2022</span><span>Explorer proof</span></div>
         </div>
         <div className="card unit-panel">
           <span className="eyebrow">NEXT ASSETS</span>
@@ -1614,7 +1614,7 @@ function InvoiceWorkspace({ onNewPayment, onUseInvoice }) {
           <label>Bill to<input value={draft.customer} onChange={(e) => { setDraft({...draft, customer:e.target.value}); setSaved(null); }}/></label>
           <div className="form-split">
             <label>Amount<input type="number" min="0.01" step="0.01" value={draft.amount} onChange={(e) => { setDraft({...draft, amount:e.target.value}); setSaved(null); }}/></label>
-            <label>Currency<select value={draft.currency} onChange={(e) => { setDraft({...draft, currency:e.target.value}); setSaved(null); }}><option>USD</option><option>GBP</option><option>CNY</option><option>INR</option><option>USDC</option><option>USDG</option><option>USDT</option></select></label>
+            <label>Currency<select value={draft.currency} onChange={(e) => { setDraft({...draft, currency:e.target.value}); setSaved(null); }}><option>USD</option><option>GBP</option><option>CNY</option><option>INR</option><option>USDC</option><option>AMA</option><option>USDT</option></select></label>
           </div>
           <label>Due date<input type="date" value={draft.dueDate} onChange={(e) => { setDraft({...draft, dueDate:e.target.value}); setSaved(null); }}/></label>
           <label>Description<textarea value={draft.description} onChange={(e) => { setDraft({...draft, description:e.target.value}); setSaved(null); }}/></label>
@@ -2075,7 +2075,7 @@ function JackSwipeWorkspace({ payments = [], onRefresh, onReview }) {
     source_amount: 2000,
     destination_currency: "USD",
     destination_amount: "$2,000",
-    route: "USD → USDG/Solana → USD",
+    route: "USD → AMA/Amadeus → USD",
     risk: { duplicate: false, beneficiary_changed: false, suspicious: false, missing_fields: [] }
   }), []);
 
@@ -2384,7 +2384,7 @@ This invoice is a Jack Swipe beta demonstration.`;
   );
 }
 
-function AgentWorkspace({ onNewPayment, onCelo }) {
+function AgentWorkspace({ onNewPayment, onAmadeus }) {
   const [messages, setMessages] = useState([
     { role: "agent", text: "Ask me about payment risk, failures, suppliers, or what needs attention. I am read-only here; money movement stays behind the structured approval flow." }
   ]);
@@ -2441,8 +2441,8 @@ function AgentWorkspace({ onNewPayment, onCelo }) {
                         <ShieldCheck size={14}/> Open structured approval flow
                       </button>
                     )}
-                    <button type="button" className="secondary" onClick={()=>onCelo?.(m.proposal)}>
-                      <Wallet size={14}/> Prepare wallet-signed Celo payment
+                    <button type="button" className="secondary" onClick={()=>onAmadeus?.(m.proposal)}>
+                      <Wallet size={14}/> Prepare wallet-signed Amadeus payment
                     </button>
                   </div>
                 )}
@@ -2776,7 +2776,7 @@ function App() {
   const [persistence, setPersistence] = useState("loading");
   const [externalReview, setExternalReview] = useState(null);
   const [externalReviewError, setExternalReviewError] = useState("");
-  const [celoSeed, setCeloSeed] = useState(null);
+  const [amaSeed, setAmadeusSeed] = useState(null);
 
   function navigateTo(view, options = {}) {
     const nextView = APP_ROUTES[view] ? view : "Overview";
@@ -2827,7 +2827,7 @@ function App() {
         ? params.get("wxToken")
         : params.get("waToken");
 
-    if (window.location.pathname.startsWith("/app/celo")) return;
+    if (window.location.pathname.startsWith("/app/ama")) return;
     if (!["whatsapp", "wechat"].includes(channel) || !paymentId || !token) return;
 
     let cancelled = false;
@@ -2870,7 +2870,7 @@ function App() {
   function routeInvoiceToPayment(invoice) {
     setInvoiceSeed(invoice);
     const currency = String(invoice?.source_currency || invoice?.destination_currency || "").toUpperCase();
-    if (["USDG", "USDC", "USDT"].includes(currency)) {
+    if (["AMA", "USDC", "USDT"].includes(currency)) {
       navigateTo("33Jack Crypto");
     } else {
       navigateTo("33Jack Pay");
@@ -2886,7 +2886,7 @@ function App() {
           : p.destination_amount || "—",
         route: p.route || "Route pending",
         status:
-          ["settled_devnet","settled_demo","settled_celo"].includes(p.status) ? "Settled"
+          ["settled_devnet","settled_demo","settled_ama"].includes(p.status) ? "Settled"
           : p.status === "approved" || p.status === "settling" ? "Review"
           : p.risk?.duplicate || p.risk?.beneficiary_changed || p.risk?.suspicious ? "Flagged"
           : "Review",
@@ -2982,7 +2982,7 @@ function App() {
             <div className="app-trusted-marquee">
               <div className="app-trusted-track">
                 {Array.from({ length: 4 }).flatMap((_, repeat) =>
-                  ["Celo", "USDC", "USDT", "Solana", "Wise", "USDG", "Telegram", "Groq", "Neon", "Vercel", "Wallets", "Global payouts"].map((item, i) => (
+                  ["Amadeus", "USDC", "USDT", "Amadeus", "Wise", "AMA", "Telegram", "Groq", "Neon", "Vercel", "Wallets", "Global payouts"].map((item, i) => (
                     <span key={repeat + item} className={"logo-type logo-" + (i % 5)}>{item}</span>
                   ))
                 )}
@@ -3041,7 +3041,7 @@ function App() {
               <h2>The customer asks for an outcome.<br/>33jack handles the plumbing.</h2>
             </div>
             <div className="rails">
-              <div><span className="sol-symbol">S</span><b>Solana</b><small>USDG settlement</small></div>
+              <div><span className="sol-symbol">S</span><b>Amadeus</b><small>AMA settlement</small></div>
               <ArrowRight/>
               <div><Banknote/><b>Banks</b><small>Local payouts</small></div>
               <ArrowRight/>
@@ -3051,9 +3051,9 @@ function App() {
             </div>
           </section>
 
-          <footer><Logo/><p>Autonomous cross-border finance for global businesses.</p><span>Colosseum build · Solana</span></footer>
+          <footer><Logo/><p>Autonomous cross-border finance for global businesses.</p><span>Colosseum build · Amadeus</span></footer>
           </> : active === "Agent" ? (
-            <AgentWorkspace onNewPayment={() => setFlow(true)} onCelo={(proposal)=>{setCeloSeed(proposal);navigateTo("Celo Mainnet");}}/>
+            <AgentWorkspace onNewPayment={() => setFlow(true)} onAmadeus={(proposal)=>{setAmadeusSeed(proposal);navigateTo("AMA Testnet");}}/>
           ) : active === "Voice Pay β" ? (
             <VoicePayWorkspace/>
           ) : active === "Jack Swipe β" ? (
@@ -3075,8 +3075,8 @@ function App() {
             <InvoiceWorkspace onUseInvoice={routeInvoiceToPayment} onNewPayment={() => setFlow(true)}/>
           ) : active === "Settlement Network" ? (
             <SettlementNetworkWorkspace/>
-          ) : active === "Celo Mainnet" ? (
-            <CeloWorkspace seed={celoSeed}/>
+          ) : active === "AMA Testnet" ? (
+            <AMAWorkspace seed={amaSeed}/>
           ) : (
             <RecordsWorkspace
               type={active}
