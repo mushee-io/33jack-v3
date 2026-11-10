@@ -12,7 +12,7 @@ export default async function handler(req,res) {
  if(msg.method==="notifications/initialized")return res.status(202).end();
  try{
   let result;
-  if(msg.method==="initialize")result={protocolVersion:VERSIONS.includes(msg.params?.protocolVersion)?msg.params.protocolVersion:VERSIONS[0],capabilities:{tools:{listChanged:false}},serverInfo:{name:"33jack-v2-celo-finance",version:"0.3.0"},instructions:"Never ask an agent to disclose payment secrets; all transfers need separately authenticated human approval and wallet signatures."};
+  if(msg.method==="initialize")result={protocolVersion:VERSIONS.includes(msg.params?.protocolVersion)?msg.params.protocolVersion:VERSIONS[0],capabilities:{tools:{listChanged:false}},serverInfo:{name:"33jack-v2-ama-finance",version:"0.3.0"},instructions:"Never ask an agent to disclose payment secrets; all transfers need separately authenticated human approval and wallet signatures."};
   else if(msg.method==="ping")result={};
   else if(msg.method==="tools/list")result={tools:PAYMENT_TOOLS};
   else if(msg.method==="tools/call"){
