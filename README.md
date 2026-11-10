@@ -98,3 +98,15 @@ permissions and M4 broadcast locks remain unchanged. KYC/KYB/AML integrations ar
 The default V3 /app/amadeus route now renders a dedicated responsive Testnet-only workspace, with accessible navigation across identity, organization overview, payments, receipts, AI, invoices and governance. Receipt finality is shown only with previously persisted independently verified M4 evidence. Every prior M4 broadcast lock, M5 read-only agent constraint, M6 invoice-audit safeguard and M7 maker-checker/emergency control remains intact.
 
 Validation: npm run test:m8, npm run test:m8:db, then npm run test:m8:restore in independent disposable PostgreSQL.
+
+
+## M9 — End-to-end Amadeus Testnet acceptance and security readiness (draft)
+[Detailed M9 acceptance, real-vs-synthetic evidence controls and NO-GO matrix](docs/M9-END-TO-END-ACCEPTANCE.md) · [Rollback, pending-transaction recovery and restore rehearsal](docs/M9-ROLLBACK-AND-INCIDENT-RUNBOOK.md).
+
+M9 adds an owner/admin-only read-only witness of previously reserved native Testnet
+Coin.transfer transactions against official Amadeus RPC, and an append-only,
+hash-linked acceptance evidence ledger. Disposable CI performs integrated M2–M8
+security/finance workflows with synthetic-only transfer evidence and an
+independent PostgreSQL restore. Neither passing CI nor a fixture is a funded
+two-wallet chain witness. Third-party security review remains NOT SUBMITTED;
+mainnet and default M4 broadcast remain NO-GO.

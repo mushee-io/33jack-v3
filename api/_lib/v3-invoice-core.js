@@ -3,6 +3,7 @@
  * Human verification is NOT supplier attestation, OCR certainty or bank payout.
  */
 import {createHash} from "node:crypto";
+import {fileURLToPath} from "node:url";
 import {PaymentError,assertWorkspaceId,assertIntentId} from "./v3-payment-core.js";
 import {nativeAddress} from "./v3-identity-core.js";
 export const M6_MAX_BYTES=1024*1024*2;
@@ -83,11 +84,17 @@ export async function extractDocument(input,{pdfLoader}={}){
   state="text_extracted_unverified";
  }else if(uploaded.format==="pdf"){
   try{
-   const pdfjs=pdfLoader?await pdfLoader():await import("pdfjs-dist/legacy/build/pdf.js");
+   const pdfjs=pdfLoader?await pdfLoader():await import("pdfjs-dist/legacy/build/pdf.mjs");
    const lib=pdfjs.getDocument?pdfjs:pdfjs.default;
+   // pdfjs-dist v6 requires an explicit standard-font directory for
+   // reliable text extraction of Helvetica/Times/Courier PDFs in Node.
+   const standardFontDataUrl=fileURLToPath(
+    new URL("../../node_modules/pdfjs-dist/standard_fonts/",import.meta.url)
+   );
    const task=lib.getDocument({
-    data:new Uint8Array(uploaded.bytes),useSystemFonts:false,
-    isEvalSupported:false,disableFontFace:true,stopAtErrors:true
+    data:new Uint8Array(uploaded.bytes),
+    standardFontDataUrl:standardFontDataUrl.endsWith("/")?standardFontDataUrl:standardFontDataUrl+"/",
+    useSystemFonts:true,isEvalSupported:false,disableFontFace:true,stopAtErrors:true
    });
    const document=await task.promise;
    pages=document.numPages;
@@ -102,7 +109,7 @@ export async function extractDocument(input,{pdfLoader}={}){
    }
    preview=chunks.join("\n").slice(0,12000);
    state=preview.trim()?"text_extracted_unverified":"pdf_no_text_manual_review";
-   await document.destroy();
+   await task.destroy();
   }catch(err){
    if(err instanceof PaymentError)throw err;
    throw new PaymentError(422,"Invalid, encrypted or unsupported invoice PDF; no extraction is trusted");
