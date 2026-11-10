@@ -109,10 +109,9 @@ export async function extractDocument(input,{pdfLoader}={}){
    }
    preview=chunks.join("\n").slice(0,12000);
    state=preview.trim()?"text_extracted_unverified":"pdf_no_text_manual_review";
-   await document.destroy();
+   await task.destroy();
   }catch(err){
    if(err instanceof PaymentError)throw err;
-   if(process.env.CI==="true")console.error("M6 safe PDF diagnostic",String(err?.name||"Error"),String(err?.message||"").slice(0,180));
    throw new PaymentError(422,"Invalid, encrypted or unsupported invoice PDF; no extraction is trusted");
   }
  }else{
