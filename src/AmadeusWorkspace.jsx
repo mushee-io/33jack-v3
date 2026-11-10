@@ -4,6 +4,7 @@ import AmadeusIdentityPanel from "./AmadeusIdentityPanel.jsx";
 import AmadeusPaymentPanel from "./AmadeusPaymentPanel.jsx";
 import AmadeusAgentPanel from "./AmadeusAgentPanel.jsx";
 import AmadeusInvoicesPanel from "./AmadeusInvoicesPanel.jsx";
+import AmadeusGovernancePanel from "./AmadeusGovernancePanel.jsx";
 
 const API="/api/v3/ama";
 async function get(operation,query=""){
@@ -33,7 +34,7 @@ export default function AmadeusWorkspace({seed=null}){
   finally{setBusy(false)}
  }
  return <section className="ama-v3">
-  <header><span className="ama-eyebrow">33JACK V3 · AMADEUS TESTNET · M6</span>
+  <header><span className="ama-eyebrow">33JACK V3 · AMADEUS TESTNET · M7</span>
    <h2>AI-assisted payments, governed by your wallet.</h2>
    <p>AI-assisted native AMA payment proposals, risk analysis and wallet-owner controls. AI tools are read-only; no AI approval, wallet signature or transaction broadcast is permitted.</p>
   </header>
@@ -49,6 +50,7 @@ export default function AmadeusWorkspace({seed=null}){
   </article>
   <AmadeusAgentPanel identity={session} connectedWallet={wallet}/>
   <AmadeusInvoicesPanel identity={session} connectedWallet={wallet}/>
+  <AmadeusGovernancePanel identity={session} connectedWallet={wallet}/>
   <AmadeusPaymentPanel identity={session} connectedWallet={wallet} seed={seed}/>
  </section>;
 }

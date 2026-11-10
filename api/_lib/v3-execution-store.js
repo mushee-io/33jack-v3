@@ -3,6 +3,7 @@ import {paymentDB} from "./v3-payment-store.js";
 import {PaymentError,assertIntentId,assertWorkspaceId} from "./v3-payment-core.js";
 import {authorizeExecutionIntent,executionIsTerminal} from "./v3-execution-core.js";
 import {hasPermission} from "./v3-identity-core.js";
+import {governanceDB,guardExecution} from "./v3-governance-store.js";
 
 let initialized;
 const DDL=[
@@ -12,7 +13,7 @@ const DDL=[
 export async function executionDB(){
  const sql=await paymentDB();
  if(!initialized)initialized=(async()=>{for(const statement of DDL)await sql.unsafe(statement);return true})().catch(e=>{initialized=null;throw e});
- await initialized;return sql;
+ await initialized;await governanceDB();return sql;
 }
 async function permission(sql,actor,workspaceId,action){
  const r=await sql.unsafe("SELECT role FROM ama_v3_memberships WHERE workspace_id=$1 AND address=$2 LIMIT 1",[workspaceId,actor]);
@@ -65,6 +66,8 @@ export async function preflightIntent({workspaceId,id,actor}){
  const intent=rows[0];
  const b=await beneficiary(sql,workspaceId,intent.recipient);
  authorizeExecutionIntent(intent,b,actor);
+ // M7 verifies current pause, risk flags and immutable approval policy at preflight.
+ await guardExecution({sql,intent,actor});
  const existing=await sql.unsafe("SELECT intent_id FROM ama_v3_executions WHERE intent_id=$1",[id]);
  if(existing.length)throw new PaymentError(409,"Payment already has a reserved signed transaction. Recover status; do not re-sign.");
  return intent;
@@ -83,6 +86,7 @@ export async function reserveSignedExecution({workspaceId,id,actor,verified}){
   }
   const b=await beneficiary(tx,workspaceId,intent.recipient);
   authorizeExecutionIntent(intent,b,actor);
+  await guardExecution({sql:tx,intent,actor});
   if(verified.signer!==intent.payer||verified.recipient!==intent.recipient||
      verified.amountUnits!==String(intent.amount_units)||verified.asset!=="AMA")
     throw new PaymentError(409,"Signed transaction does not match the approved payment");

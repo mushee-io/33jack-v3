@@ -80,3 +80,13 @@ Validation: npm run test:m5, and npm run test:m5:db with disposable PostgreSQL.
 ## M6 — Invoice intelligence and independent Testnet reconciliation (draft)
 
 See [M6 comprehensive engineering, security and acceptance notes](docs/M6-INVOICE-RECONCILIATION.md). Native AMA-only human-authorized invoice review, SHA-256 document intake, duplicate control, organization-scoped PostgreSQL, read-only M4 finalized receipt accounting and formula-safe CSV are available as draft code. Image OCR and verified fiat FX/bank settlement are NOT claimed. M4 broadcast flags and M5 AI permissions are unchanged.
+
+
+## M7 — Native AMA Testnet security and governance (draft)
+[Full M7 financial controls, security audit, rollback and provider boundary specification](docs/M7-GOVERNANCE-SECURITY.md).
+
+M7 adds versioned organization payment policies, per-payment and daily native AMA limits,
+high-risk maker-checker separation, immutable M3 approval-policy seals, M4 execution gates,
+owner/admin emergency pause, two-person resume, manual suspicious-invoice/recipient holds,
+incident records and hash-linked append-only security events. Existing M5 read-only agent
+permissions and M4 broadcast locks remain unchanged. KYC/KYB/AML integrations are NOT present.

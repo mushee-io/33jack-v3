@@ -1,6 +1,7 @@
 import {randomUUID} from "node:crypto";
 import {identityDB} from "./v3-identity-store.js";
 import {hasPermission,nativeAddress} from "./v3-identity-core.js";
+import {governanceDB,guardPaymentCreate,guardPaymentTransition,sealFinancialApproval} from "./v3-governance-store.js";
 import {PaymentError,assertWorkspaceId,assertIntentId,requestFingerprint,sha256,randomIntentNonce,intentTerms,termsFingerprint,assertExactReview,assertBeneficiarySnapshot,mayTransition,approvalReviewResult,assertIdempotencyKey,normalizeM3Request} from "./v3-payment-core.js";
 
 /* Durable, workspace-scoped intent ledger: no keys, broadcast, or fake settlement. */
@@ -51,7 +52,7 @@ export async function createIntent({input,actor,idempotencyKey}){
  const key=assertIdempotencyKey(idempotencyKey);
  const keyHash=sha256(["v3",workspaceId,actor,key].join("\n"));
  const requestHash=requestFingerprint(normalized);
- const sql=await paymentDB();
+ const sql=await paymentDB();await governanceDB();
  return sql.begin(async tx=>{
   await membership(tx,actor,workspaceId,"payment:propose");
   const found=await tx.unsafe("SELECT * FROM ama_v3_payment_intents WHERE workspace_id=$1 AND created_by=$2 AND idempotency_hash=$3 LIMIT 1",[workspaceId,actor,keyHash]);
@@ -63,6 +64,7 @@ export async function createIntent({input,actor,idempotencyKey}){
   if(!b||b.status!=="allowed")throw new PaymentError(403,"Recipient must be explicitly allowlisted before payment preparation");
   const active=await tx.unsafe("SELECT COUNT(*)::integer AS n FROM ama_v3_payment_intents WHERE workspace_id=$1 AND created_by=$2 AND status IN ('draft','reviewed','awaiting_wallet_signature') AND expires_at>NOW()",[workspaceId,actor]);
   if(active[0].n>=20)throw new PaymentError(429,"Too many active payment intents; cancel or expire an earlier intent");
+  await guardPaymentCreate({sql:tx,workspaceId,actor,amountUnits:normalized.amountUnits,recipient,invoiceRef:normalized.invoiceRef});
   const nonce=randomIntentNonce(),expiresAt=Date.now()+normalized.expiresInMinutes*60000;
   const terms=intentTerms(normalized,{beneficiaryVersion:Number(b.version),expiresAt,nonce});
   const termsHash=termsFingerprint(terms),id=randomUUID();
@@ -96,7 +98,7 @@ export async function listIntents({workspaceId,actor}){
 export async function transitionIntent({workspaceId,id,actor,expectedHash,action}){
  workspaceId=assertWorkspaceId(workspaceId);id=assertIntentId(id);
  if(!["review","approve","cancel"].includes(action))throw new PaymentError(400,"Unsupported M3 transition");
- const sql=await paymentDB();
+ const sql=await paymentDB();await governanceDB();
  return sql.begin(async tx=>{
   const m=await membership(tx,actor,workspaceId,action==="cancel"?"payment:read":"payment:approve");
   const rows=await tx.unsafe("SELECT * FROM ama_v3_payment_intents WHERE id=$1 AND workspace_id=$2 FOR UPDATE",[id,workspaceId]);
@@ -107,10 +109,15 @@ export async function transitionIntent({workspaceId,id,actor,expectedHash,action
     throw new PaymentError(403,"Only an approver or original payer may cancel");
   const b=await beneficiary(tx,workspaceId,row.recipient,true);
   if(action!=="cancel")assertBeneficiarySnapshot(row,b);
+  // M7 governs the *existing* M3 transition; cancel remains available while paused.
+  const governance=action==="cancel"?null:await guardPaymentTransition({sql:tx,intent:row,actor,action});
   const next={review:"reviewed",approve:"awaiting_wallet_signature",cancel:"cancelled"}[action];
   if(!mayTransition(row.status,next))throw new PaymentError(409,"Illegal payment state transition");
   const changed=await tx.unsafe("UPDATE ama_v3_payment_intents SET status=$1,reviewed_by=CASE WHEN $2='review' THEN $3 ELSE reviewed_by END,approved_by=CASE WHEN $2='approve' THEN $3 ELSE approved_by END,approval_terms_hash=CASE WHEN $2='approve' THEN terms_hash ELSE approval_terms_hash END,updated_at=NOW() WHERE id=$4 AND workspace_id=$5 AND status=$6 AND expires_at>NOW() RETURNING *",[next,action,actor,id,workspaceId,row.status]);
   if(!changed.length)throw new PaymentError(409,"Payment intent expired or changed during review");
+  if(action==="approve")await sealFinancialApproval({
+   sql:tx,intent:changed[0],actor,policy:governance.policy,risk:governance.risk
+  });
   await audit(tx,changed[0],actor,"intent_"+action,{from:row.status,to:next,termsHash:row.terms_hash});
   return {row:changed[0],beneficiary:b};
  });
