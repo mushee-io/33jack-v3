@@ -191,7 +191,7 @@ export default async function handler(req, res) {
             ? "Beneficiary details differ from the stored supplier profile and require explicit acknowledgement."
             : base.risk.summary
       },
-      recommended_route: routing.best?.label || `GBP → USDC/Solana → ${corridor}`,
+      recommended_route: routing.best?.label || `GBP → USDC/Amadeus → ${corridor}`,
       route_options: routing,
       quote_mode: routing.mode
     };
@@ -346,7 +346,7 @@ Do not claim duplicate detection or beneficiary-history verification; 33jack per
       risk,
       beneficiary_history_found: Boolean(history),
       recommended_route: routing.best?.label ||
-        `${parsed.source_currency || "GBP"} → USDC/Solana → ${parsed.destination_currency || corridor}`,
+        `${parsed.source_currency || "GBP"} → USDC/Amadeus → ${parsed.destination_currency || corridor}`,
       route_options: routing,
       quote_mode: routing.mode,
       mode: "groq"
