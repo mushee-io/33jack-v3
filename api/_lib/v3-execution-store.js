@@ -66,6 +66,8 @@ export async function preflightIntent({workspaceId,id,actor}){
  const intent=rows[0];
  const b=await beneficiary(sql,workspaceId,intent.recipient);
  authorizeExecutionIntent(intent,b,actor);
+ // M7 verifies current pause, risk flags and immutable approval policy at preflight.
+ await guardExecution({sql,intent,actor});
  const existing=await sql.unsafe("SELECT intent_id FROM ama_v3_executions WHERE intent_id=$1",[id]);
  if(existing.length)throw new PaymentError(409,"Payment already has a reserved signed transaction. Recover status; do not re-sign.");
  return intent;
