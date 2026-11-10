@@ -19,7 +19,7 @@ const approvalRoles=new Set(["owner","admin","approver"]);
 const proposalRoles=new Set(["owner","admin","operator"]);
 const manageRoles=new Set(["owner","admin"]);
 
-export default function AmadeusPaymentPanel({identity,connectedWallet,seed}){
+export default function AmadeusPaymentPanel({identity,connectedWallet,seed,agentSeed}){
  const [workspaceId,setWorkspaceId]=useState("");
  const [rec,setRec]=useState("");
  const [amount,setAmount]=useState("1");
@@ -111,9 +111,16 @@ export default function AmadeusPaymentPanel({identity,connectedWallet,seed}){
    "&workspaceId="+encodeURIComponent(workspaceId)+"&id="+encodeURIComponent(item.id)});
   setIntent(data.intent);setChecked(false);
  }
+ useEffect(()=>{
+  if(!agentSeed||!sessionActive||!workspaceId||agentSeed.workspaceId!==workspaceId)return;
+  setRec(agentSeed.recipient||"");setAmount(agentSeed.amount||"");
+  setInvoiceRef(agentSeed.invoiceRef||"");
+  setMemo("Human review of agent suggestion; not an authorization.");
+  setIntent(null);setChecked(false);setKey(makeKey());
+ },[agentSeed?.id,workspaceId,sessionActive]);
  const known=beneficiaries.find(x=>x.address===rec);
  return <div className="ama-m3">
-  <header><span className="ama-eyebrow">M3 · NATIVE AMA PAYMENT ENGINE</span>
+  <header><span className="ama-eyebrow">M3 + M5 · HUMAN-REVIEWED AMA PAYMENT ENGINE</span>
    <h3>Prepare exact wallet-owned transfer intents</h3>
    <p>Prepared calls are unsigned JSON instructions, not signed blockchain transactions. They cannot move AMA in M3.</p></header>
   {!sessionActive?<div className="ama-m3-warning">You must connect and authenticate the same Amadeus Testnet wallet in M2 before creating or viewing organization payment intents. Database availability and extension-compatible login are required.</div>:<>
