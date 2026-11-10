@@ -36,7 +36,7 @@ test("M3 stores exact native 9-decimal amounts and rejects unsupported networks"
  assert.throws(()=>normalizeM3Request({...base,network:"celo"},payer),/Only Amadeus Testnet/);
  assert.throws(()=>normalizeM3Request({...base,token:"USDC"},payer),/Only native AMA/);
  assert.throws(()=>normalizeM3Request({...base,recipient:"0xabcdef"},payer),/Base58/);
- assert.throws(()=>normalizeM3Request({...base,payer:recipient},payer),/authenticated wallet owner/);
+ assert.throws(()=>normalizeM3Request({...base,payer:addr()},payer),/authenticated wallet owner/);
  assert.throws(()=>normalizeM3Request({...base,expiresInMinutes:1},payer),/Expiry/);
  assert.throws(()=>normalizeM3Request({...base,memo:"unsafe\nnewline"},payer),/invalid characters/);
  assert.throws(()=>normalizeM3Request({...base,recipient:payer},payer),/self-transfer/);
