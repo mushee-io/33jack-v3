@@ -75,3 +75,8 @@ Groq explanations are OFF by default; the MCP/A2A-shaped adapters are
 authenticated local APIs, not claimed public interoperable networks.
 
 Validation: npm run test:m5, and npm run test:m5:db with disposable PostgreSQL.
+
+
+## M6 — Invoice intelligence and independent Testnet reconciliation (draft)
+
+See [M6 comprehensive engineering, security and acceptance notes](docs/M6-INVOICE-RECONCILIATION.md). Native AMA-only human-authorized invoice review, SHA-256 document intake, duplicate control, organization-scoped PostgreSQL, read-only M4 finalized receipt accounting and formula-safe CSV are available as draft code. Image OCR and verified fiat FX/bank settlement are NOT claimed. M4 broadcast flags and M5 AI permissions are unchanged.
