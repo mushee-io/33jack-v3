@@ -61,6 +61,7 @@ export default function AmadeusIdentityPanel({onWalletChange}){
  useEffect(()=>{
   const provider=window.amadeus;
   const invalidated=()=>{
+   if(session&&csrf)call("auth-logout",{body:{logout:true},csrf}).catch(()=>{});
    setAccount("");setSession(null);setCsrf("");setWorkspaces([]);
    onWalletChange?.("");
    setInfo("Account or network changed. Reconnect and authenticate.");
@@ -73,7 +74,7 @@ export default function AmadeusIdentityPanel({onWalletChange}){
    for(const event of ["accountsChanged","networkChanged","disconnect","lock"])
     provider?.removeListener?.(event,invalidated);
   };
- },[onWalletChange]);
+ },[onWalletChange,session,csrf]);
  async function run(task){
   setBusy(true);setError("");setInfo("");
   try{await task()}catch(e){setError(e?.message||"Identity operation failed")}
@@ -85,6 +86,7 @@ export default function AmadeusIdentityPanel({onWalletChange}){
   setAccount(data.address);
  }
  async function connect(){
+  if(session&&csrf)await call("auth-logout",{body:{logout:true},csrf});
   const provider=window.amadeus;
   if(!provider?.requestAccounts)throw Error("Install the official Amadeus Wallet extension.");
   await checkWalletNetwork(provider);
