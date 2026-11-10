@@ -19,7 +19,7 @@ function response(op,{method="POST",headers={},body={},query={}}={}){
   const res={statusCode:200,headers:{},setHeader(k,v){this.headers[k]=v;return this},
    status(code){this.statusCode=code;return this},
    json(data){resolve({status:this.statusCode,data});return this}};
-  Promise.resolve(paymentHandler({method,query:{operation:op,...query},headers:{host,origin,...headers},body},res))
+  Promise.resolve(paymentHandler({method,query:{operation:op,...query},headers:{host,origin,...headers},body},res,op))
    .catch(err=>resolve({status:500,error:err.message}));
  });
 }
