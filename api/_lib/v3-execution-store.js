@@ -3,6 +3,7 @@ import {paymentDB} from "./v3-payment-store.js";
 import {PaymentError,assertIntentId,assertWorkspaceId} from "./v3-payment-core.js";
 import {authorizeExecutionIntent,executionIsTerminal} from "./v3-execution-core.js";
 import {hasPermission} from "./v3-identity-core.js";
+import {guardExecution} from "./v3-governance-store.js";
 
 let initialized;
 const DDL=[
@@ -83,6 +84,7 @@ export async function reserveSignedExecution({workspaceId,id,actor,verified}){
   }
   const b=await beneficiary(tx,workspaceId,intent.recipient);
   authorizeExecutionIntent(intent,b,actor);
+  await guardExecution({sql:tx,intent,actor});
   if(verified.signer!==intent.payer||verified.recipient!==intent.recipient||
      verified.amountUnits!==String(intent.amount_units)||verified.asset!=="AMA")
     throw new PaymentError(409,"Signed transaction does not match the approved payment");
