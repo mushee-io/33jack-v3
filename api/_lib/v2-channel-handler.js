@@ -1,8 +1,8 @@
 import { randomUUID } from "node:crypto";
 import { requireHumanApproval } from "./agent-v2-auth.js";
 import { authorizeChannelInvoice, assertInvoiceEligibility, safeInvoiceSummary } from "./channel-v2-auth.js";
-import { normalizeCeloProposal, prepareCeloTransfer, verifyCeloPayment } from "./celo-v2.js";
-import { addAuditEvent, markCeloInvoiceSettled, getPayment } from "./db.js";
+import { normalizeAmaProposal, prepareAmaTransfer, verifyAmaPayment } from "./ama-v3.js";
+import { addAuditEvent, markAMAInvoiceSettled, getPayment } from "./db.js";
 import { sendTelegramPaymentReceipt } from "./telegram.js";
 import { sendWhatsAppPaymentReceipt } from "./whatsapp.js";
 import { sendWeChatPaymentReceipt } from "./wechat.js";
@@ -10,7 +10,7 @@ import { proposeV2Intent, getV2Intent, getV2IntentForInvoice, approveV2Intent, r
 
 async function notifyChannelReceipt(ctx) {
   const payment = await getPayment(ctx.payment.id);
-  if (!payment || payment.status !== "settled_celo") return {attempted:false};
+  if (!payment || payment.status !== "settled_ama") return {attempted:false};
   const identity = ctx.identity.slice(ctx.channel.length + 1);
   const base = String(process.env.PUBLIC_APP_URL || process.env.APP_BASE_URL || "").replace(/\/$/,"");
   const notify = {
@@ -22,13 +22,13 @@ async function notifyChannelReceipt(ctx) {
     const result = await notify[ctx.channel]();
     return {attempted:true, sent:result.ok === true, idempotent:result.idempotent === true};
   } catch(error) {
-    await addAuditEvent(payment.id,"celo_v2_channel_receipt_failed",ctx.identity,{reason:String(error.message||"unknown").slice(0,160)}).catch(()=>{});
+    await addAuditEvent(payment.id,"ama_v2_channel_receipt_failed",ctx.identity,{reason:String(error.message||"unknown").slice(0,160)}).catch(()=>{});
     return {attempted:true,sent:false};
   }
 }
 const errorJson = (res, err) => res.status(err?.status || (err?.code === "23505" ? 409 : 400)).json({
   ok: false,
-  error: err?.status === 503 ? "V2 integration is not configured" : String(err?.message || "Celo checkout failed").slice(0, 260)
+  error: err?.status === 503 ? "V2 integration is not configured" : String(err?.message || "AMA checkout failed").slice(0, 260)
 });
 function strictUuid(id) {
   const s = String(id || "");
@@ -63,7 +63,7 @@ export default async function handler(req, res) {
     if (op === "propose") {
       const risk = assertInvoiceEligibility(ctx.payment, body.acknowledgements || {});
       if (body.confirmExactTerms !== true) throw Object.assign(new Error("Verify the exact wallet address and amount before proposing"),{status:400});
-      const input = normalizeCeloProposal({
+      const input = normalizeAmaProposal({
         token: body.token, amount: body.amount, recipient: body.recipient,
         payer: body.payer, memo: "33JACK invoice:" + ctx.payment.id
       });
@@ -71,7 +71,7 @@ export default async function handler(req, res) {
       const origin = { channel: ctx.channel, workspaceId: ctx.workspaceId, invoiceId: ctx.payment.id,
         invoiceRef: summary.invoice, createdBy: ctx.identity, riskAcknowledged: risk.acknowledgements };
       const result = await proposeV2Intent(ctx.actorId, { ...input, sourceContext: origin }, "invoice:" + ctx.payment.id);
-      await addAuditEvent(ctx.payment.id,"celo_v2_proposed",ctx.identity, {
+      await addAuditEvent(ctx.payment.id,"ama_v2_proposed",ctx.identity, {
         intent_id:result.intent.id, channel:ctx.channel, workspace_id:ctx.workspaceId, risk_flags:risk.flags, created:result.created
       });
       return res.status(result.created ? 201 : 200).json({ ok:true, ...result, invoice:summary });
@@ -80,7 +80,7 @@ export default async function handler(req, res) {
     const intent = enforceBoundInvoice(await getV2Intent(ctx.actorId,id),ctx.payment.id);
     if (op === "refresh") {
       return res.status(200).json({ ok:true, invoice:summary, intent,
-        unsignedTransaction: intent.status==="approved" ? prepareCeloTransfer(intent) : null });
+        unsignedTransaction: intent.status==="approved" ? prepareAmaTransfer(intent) : null });
     }
     if (op === "approve") {
       const gate = requireHumanApproval(req);
@@ -97,28 +97,28 @@ export default async function handler(req, res) {
       }
       const updated = await approveV2Intent(ctx.actorId,id,gate.operatorId || "legacy-api-key");
       if (!updated) throw Object.assign(new Error("Proposal expired or has already changed state"),{status:409});
-      await addAuditEvent(ctx.payment.id,"celo_v2_approved",ctx.identity,{
+      await addAuditEvent(ctx.payment.id,"ama_v2_approved",ctx.identity,{
         intent_id:id,channel:ctx.channel,workspace_id:ctx.workspaceId
       });
-      return res.status(200).json({ ok:true,intent:updated,unsignedTransaction:prepareCeloTransfer(updated),nextAction:"wallet_signature_required" });
+      return res.status(200).json({ ok:true,intent:updated,unsignedTransaction:prepareAmaTransfer(updated),nextAction:"wallet_signature_required" });
     }
     if (intent.status === "confirmed") {
-      const invoiceSynced = await markCeloInvoiceSettled(ctx.payment.id,ctx.workspaceId,intent.txHash,intent).catch(()=>false);
+      const invoiceSynced = await markAMAInvoiceSettled(ctx.payment.id,ctx.workspaceId,intent.txHash,intent).catch(()=>false);
       const channelReceipt = invoiceSynced ? await notifyChannelReceipt(ctx) : {attempted:false};
       return res.status(200).json({ok:true,intent,idempotent:true,invoiceSynced,channelReceipt});
     }
     if (intent.status !== "approved" || Date.now() >= new Date(intent.expiresAt).getTime()) {
       throw Object.assign(new Error("Proposal is not approved or has expired"),{status:409});
     }
-    const verification = await verifyCeloPayment(intent,body.txHash,intent.approvedAt);
+    const verification = await verifyAmaPayment(intent,body.txHash,intent.approvedAt);
     if (verification.pending) return res.status(202).json({ok:false,status:"pending",...verification});
     const updated = await recordV2Confirmation(ctx.actorId,id,verification);
     if (!updated) throw Object.assign(new Error("Payment changed state; reload"),{status:409});
-    await addAuditEvent(ctx.payment.id,"celo_v2_confirmed",ctx.identity,{
-      intent_id:id,network:"celo",tx_hash:verification.txHash,token:intent.token,
+    await addAuditEvent(ctx.payment.id,"ama_v2_confirmed",ctx.identity,{
+      intent_id:id,network:"ama",tx_hash:verification.txHash,token:intent.token,
       amount:intent.amount,recipient:intent.recipient,workspace_id:ctx.workspaceId
     });
-    const invoiceSynced = await markCeloInvoiceSettled(ctx.payment.id,ctx.workspaceId,verification.txHash,updated).catch(()=>false);
+    const invoiceSynced = await markAMAInvoiceSettled(ctx.payment.id,ctx.workspaceId,verification.txHash,updated).catch(()=>false);
     const channelReceipt = invoiceSynced ? await notifyChannelReceipt(ctx) : {attempted:false};
     return res.status(200).json({ok:true,intent:updated,verification,invoiceSynced,channelReceipt});
   } catch(err) { return errorJson(res,err); }
