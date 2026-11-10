@@ -108,6 +108,8 @@ body{font-family:'JetBrains Mono',ui-monospace,monospace;color:var(--ink);-webki
 .lg{display:grid;grid-template-columns:3.6rem 1fr;gap:1.1rem;align-items:center;margin-top:.15rem}
 #play{width:3.4rem;height:3.4rem;border-radius:50%;background:var(--coral);border:0;display:grid;place-items:center;cursor:pointer}
 #play svg{width:1.3rem;height:1.3rem;fill:#fff}
+.play-control{display:grid;justify-items:center;gap:.2rem}
+#play-hint{font-size:.55rem;font-weight:600;white-space:nowrap;color:var(--ink)}
 .lgh{display:flex;justify-content:space-between;font-size:.66rem;letter-spacing:.14em;color:var(--mid)}
 #msg{color:var(--coral);font-weight:600}
 #rail{position:relative;height:1.6rem;cursor:pointer;margin-top:.2rem;touch-action:none}
@@ -167,7 +169,7 @@ body{font-family:'JetBrains Mono',ui-monospace,monospace;color:var(--ink);-webki
 
     <div id="mode"><div class="t">OPERATING MODE</div><div class="m" id="mm">JETTING</div><div class="t" id="ms"></div></div>
     <section class="logcard"><div class="ct"><span>OPERATION LOG</span><small>08</small></div>
-      <div class="lg"><button id="play" aria-label="Pause"><svg viewBox="0 0 12 12"><path id="pi" d="M2 1h3v10H2zM7 1h3v10H7z"/></svg></button>
+      <div class="lg"><div class="play-control"><button id="play" aria-label="Pause"><svg viewBox="0 0 12 12"><path id="pi" d="M2 1h3v10H2zM7 1h3v10H7z"/></svg></button><span id="play-hint" aria-hidden="true" hidden>PLAY TOUR</span></div>
         <div><div class="lgh"><span>DIVE</span><span id="msg"></span><span>SURFACE</span></div>
         <div id="rail" role="slider" tabindex="0" aria-label="Timeline" aria-valuemin="0" aria-valuemax="25" aria-valuenow="0"><div class="b"></div><div id="fill"></div><div id="knob"></div></div>
         <div class="sm"><span id="tc">00:00 / 00:25</span><span>8 OPERATOR ACTIONS</span></div></div></div></section>
@@ -537,10 +539,10 @@ function drawChart(t) {
 }
 
 /* ---------- layout ---------- */
-let W = 1, H_ = 1;
+let W = 1, H_ = 1, slowFrames = 0, lightweightRendering = false;
 function resize() {
   W = innerWidth; H_ = innerHeight;
-  renderer.setPixelRatio(Math.min(devicePixelRatio, 1.75));
+  renderer.setPixelRatio(Math.min(devicePixelRatio, lightweightRendering ? .75 : 1.75));
   renderer.setSize(W, H_, false);
   camera.aspect = W / H_; camera.updateProjectionMatrix();
   leaders.setAttribute('viewBox', `0 0 ${W} ${H_}`);
@@ -550,13 +552,15 @@ addEventListener('resize', resize); resize();
 /* ---------- input ---------- */
 let playing = !matchMedia('(prefers-reduced-motion: reduce)').matches;
 let playT = playing ? 0 : 21, orbitX = 0, orbitY = 0, orbitXs = 0, orbitYs = 0, drag = null, scrub = false;
+let lastFrame = null;
 const seekTo = t => { playT = clamp(t, 0, DUR - .001); for (const k in manual) delete manual[k]; };
 const playButton = $('play');
 function syncPlayButton() {
   playButton.setAttribute('aria-label', playing ? 'Pause' : 'Play');
+  $('play-hint').hidden = playing;
   $('pi').setAttribute('d', playing ? 'M2 1h3v10H2zM7 1h3v10H7z' : 'M3 1l8 5-8 5z');
 }
-playButton.onclick = () => { playing = !playing; syncPlayButton(); };
+playButton.onclick = () => { playing = !playing; lastFrame = null; syncPlayButton(); };
 syncPlayButton();
 canvas.addEventListener('pointerdown', e => { drag = [e.clientX, e.clientY]; canvas.classList.add('drag'); canvas.setPointerCapture(e.pointerId); });
 canvas.addEventListener('pointermove', e => { if (!drag) return; orbitX -= (e.clientX - drag[0]) * .006; orbitY = clamp(orbitY + (e.clientY - drag[1]) * .004, -.9, .9); drag = [e.clientX, e.clientY]; });
@@ -717,13 +721,22 @@ function hud(t) {
 
 function draw(t, wall) { apply(t, wall); renderer.render(scene, camera); hud(t); }
 
-let last = performance.now();
 function loop(now) {
-  const dt = Math.min(.05, (now - last) / 1000); last = now;
-  if (!frozen) { if (playing && !scrub) playT = (playT + dt) % DUR; draw(playT, now / 1000); }
+  const dt = lastFrame === null ? 0 : (now - lastFrame) / 1000;
+  lastFrame = now;
+  if (playing && !lightweightRendering) {
+    slowFrames = dt > .075 ? slowFrames + 1 : 0;
+    if (slowFrames >= 4) {
+      lightweightRendering = true;
+      renderer.shadowMap.enabled = false;
+      resize();
+    }
+  }
+  if (playing && !scrub) playT = (playT + dt) % DUR;
+  draw(playT, now / 1000);
   requestAnimationFrame(loop);
 }
-let frozen = false;
+document.addEventListener('visibilitychange', () => { lastFrame = null; });
 document.fonts.ready.then(() => { if (lastSec) hud(playT); });
 requestAnimationFrame(loop);
 </script>
