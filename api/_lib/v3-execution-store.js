@@ -36,6 +36,15 @@ async function beneficiary(sql,workspaceId,recipient){
 }
 function publicExecution(row,intent){
  if(!row)return null;
+ // Normalize PostgreSQL JSONB readback; some driver combinations return
+ // a JSON-encoded text value rather than the parsed object.
+ let receipt=row.receipt??null;
+ for(let i=0;i<2&&typeof receipt==="string";i++){
+  try{receipt=JSON.parse(receipt)}catch{receipt=null}
+ }
+ if(!receipt||typeof receipt!=="object"||Array.isArray(receipt)||
+    receipt.network!=="amadeus-testnet"||receipt.txHash!==row.tx_hash||
+    receipt.executionSuccess!==true)receipt=null;
  return {
   intentId:row.intent_id,workspaceId:row.workspace_id,txHash:row.tx_hash,
   status:row.status,network:"amadeus-testnet",payer:intent?.payer||null,
@@ -43,7 +52,7 @@ function publicExecution(row,intent){
   asset:"AMA",broadcastAttempts:row.broadcast_attempts,
   broadcastStartedAt:row.broadcast_started_at,checkedAt:row.checked_at,
   verifiedAt:row.verified_at,reason:row.last_error||null,
-  receipt:row.receipt||null,independentlyVerified:row.status==="finalized"&&!!row.receipt,
+  receipt,independentlyVerified:row.status==="finalized"&&!!receipt&&receipt.finality==="finalized",
   mayRetryBroadcast:false
  };
 }
@@ -91,11 +100,12 @@ export async function recordBroadcastResult({workspaceId,id,hash,status,actor,re
  const sql=await executionDB();
  return sql.begin(async tx=>{
   await permission(tx,actor,workspaceId,"payment:read");
+  // Consistent lock order: intent first, execution second (matches reserve/reconcile).
+  const intent=await lockedIntent(tx,workspaceId,id);
   const rows=await tx.unsafe(
    "UPDATE ama_v3_executions SET status=$1,last_error=$2,updated_at=NOW() WHERE intent_id=$3 AND workspace_id=$4 AND tx_hash=$5 AND status='reserved' RETURNING *",
    [status,reason?String(reason).slice(0,150):null,id,workspaceId,hash]
   );
-  const intent=await lockedIntent(tx,workspaceId,id);
   if(rows.length)await recordEvent(tx,intent,actor,"m4_broadcast_"+status,{txHash:hash});
   const existing=rows[0]||(await tx.unsafe("SELECT * FROM ama_v3_executions WHERE intent_id=$1 AND workspace_id=$2",[id,workspaceId]))[0];
   if(!existing)throw new PaymentError(404,"Reserved signed transaction not found");
