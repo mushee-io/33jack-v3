@@ -14,8 +14,8 @@ export function getAmaRpcUrl() {
   if (parsed.protocol !== "https:" || parsed.username || parsed.password || parsed.search || parsed.hash)
     throw new Error("AMA_TESTNET_RPC_URL must be an HTTPS RPC API URL");
   if (parsed.hostname === "mainnet-rpc.ama.one") throw new Error("Refusing Amadeus mainnet in V3 Testnet");
-  if (parsed.hostname !== "testnet-rpc.ama.one" && process.env.AMA_TESTNET_ALLOW_CUSTOM_RPC !== "true")
-    throw new Error("Only official Amadeus Testnet RPC allowed unless custom Testnet RPC explicitly enabled");
+  if (parsed.hostname !== "testnet-rpc.ama.one" || parsed.pathname !== "/api" || parsed.port)
+    throw new Error("Only official Amadeus Testnet RPC is permitted in V3 M1");
   return value.replace(/\/$/, "");
 }
 
