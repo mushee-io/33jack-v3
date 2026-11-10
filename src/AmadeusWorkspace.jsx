@@ -1,7 +1,8 @@
 import React,{useCallback,useEffect,useRef,useState} from "react";
-import {Activity,ArrowRight,ShieldCheck,WalletCards,Wifi,WifiOff} from "lucide-react";
+import {Activity,ArrowRight,ChevronUp,ShieldCheck,WalletCards,Wifi,WifiOff} from "lucide-react";
 import "./amadeus.css";
 import "./amadeus-experience.css";
+import "./amadeus-interior.css";
 import {AMADEUS_TABS,nextAmadeusTab,walletUiState} from "./amadeus-ui-model.js";
 import AmadeusIdentityPanel from "./AmadeusIdentityPanel.jsx";
 import AmadeusPaymentPanel from "./AmadeusPaymentPanel.jsx";
@@ -14,6 +15,7 @@ import AmadeusDemoPanel from "./AmadeusDemoPanel.jsx";
 import AmadeusReceiptsPanel from "./AmadeusReceiptsPanel.jsx";
 
 const API="/api/v3/ama";
+const workstreams=["Wallet identity","AMA payments","Chain evidence","Financial agent","Invoice review","Governance"];
 async function read(operation,query=""){
  const response=await fetch(API+"?operation="+operation+query,{method:"GET",credentials:"same-origin",
   headers:{"Accept":"application/json"}});
@@ -32,6 +34,8 @@ export default function AmadeusWorkspace({seed=null}){
  const [balanceBusy,setBalanceBusy]=useState(false);
  const [balanceError,setBalanceError]=useState("");
  const navRefs=useRef({});
+ const menuRef=useRef(null);
+ const navigationRef=useRef(null);
  const onWalletChange=useCallback(address=>{
   setWallet(address||"");setBalance(null);setBalanceError("");
   if(!address){setSession(null);setNetworkVerified(false)}
@@ -62,6 +66,12 @@ export default function AmadeusWorkspace({seed=null}){
   changeSection(next);
   navRefs.current[next]?.focus();
  }
+ function openSection(id){
+  menuRef.current?.close();
+  changeSection(id);
+  navRefs.current[id]?.focus({preventScroll:true});
+  navigationRef.current?.scrollIntoView({block:"start"});
+ }
  async function refreshBalance(){
   if(!state.ready)throw Error("Authenticate a native Testnet wallet and independently verify its network first");
   setBalanceBusy(true);setBalanceError("");
@@ -81,29 +91,47 @@ export default function AmadeusWorkspace({seed=null}){
  }
  return <section className="ama-v3 ama-m8-shell" aria-label="33JACK V3 native Amadeus Testnet workspace">
   <a className="ama-m8-skip" href="#ama-m8-content">Skip to Testnet workspace content</a>
-  <header className="ama-m8-hero">
-   <div className="ama-m8-hero-top">
-    <div className="ama-m8-brand"><span className="ama-m8-brand-symbol" aria-hidden="true">33</span>
-     <span>33JACK <small>V3 · M10</small></span></div>
-    <span className="ama-m8-net-chip"><span className="ama-m8-net-dot" aria-hidden="true"/> AMADEUS L1 TESTNET</span>
+  <div className="ama-m8-topbar">
+   <a className="ama-m8-brand" href="/" aria-label="33JACK home">33JACK <sup>V3</sup></a>
+   <button type="button" className="ama-m8-menu-button" aria-haspopup="dialog" onClick={()=>menuRef.current?.showModal()}>
+    Menu <ChevronUp size={16} aria-hidden="true"/>
+   </button>
+  </div>
+  <dialog className="ama-m8-menu" ref={menuRef} aria-label="Workspace menu">
+   <div className="ama-m8-menu-inner">
+    <form method="dialog"><button className="ama-m8-menu-button">Close <ChevronUp size={16} aria-hidden="true"/></button></form>
+    <nav aria-label="Workspace menu links">
+     {AMADEUS_TABS.map(item=><button key={item.id} type="button" onClick={()=>openSection(item.id)}>{item.label}</button>)}
+     <a href="/">Homepage</a>
+    </nav>
+    <small>33JACK V3 · Amadeus L1 Testnet</small>
    </div>
+  </dialog>
+  <header className="ama-m8-hero">
+   {["left","right","top"].map(side=><div key={side} className={"ama-m8-curves is-"+side} aria-hidden="true">
+    {Array.from({length:20},(_,index)=><i key={index} style={{"--curve-index":index}}/>)}
+   </div>)}
    <div className="ama-m8-hero-body">
-    <div><span className="ama-eyebrow">WALLET-OWNED FINANCIAL OPERATIONS</span>
-     <h1>Business finance, without handing over your keys.</h1>
-     <p>One native Testnet workspace for payment intents, invoice provenance, read-only AI insights and independently checked transaction evidence. You remain in control of approval and signing.</p>
-     <div className="ama-m8-hero-actions">
-      <button type="button" onClick={()=>changeSection("payments")}>Open native AMA payments <ArrowRight size={16} aria-hidden="true"/></button>
-      <button type="button" className="ama-m8-secondary" onClick={()=>changeSection("wallet")}>Manage wallet & organizations</button>
-     </div>
+    <div className="ama-m8-ticker" aria-hidden="true"><div>
+     {Array.from({length:4},(_,copy)=>workstreams.map(name=><span key={copy+name}>{name}</span>))}
+    </div></div>
+    <h1>Business finance.<br/><em>Your keys.</em></h1>
+    <p>One native Amadeus Testnet workspace for payment intents, invoice review, read-only AI and independently checked transaction evidence.</p>
+    <div className="ama-m8-hero-actions">
+     <button type="button" onClick={()=>openSection("payments")}>Open AMA payments <ArrowRight size={16} aria-hidden="true"/></button>
+     <button type="button" className="ama-m8-secondary" onClick={()=>openSection("wallet")}>
+      <span className="ama-m8-wallet-icon"><WalletCards size={18} aria-hidden="true"/></span>
+      <span>Manage wallet & organizations<small><span className="ama-m8-net-dot" aria-hidden="true"/> AMADEUS L1 TESTNET</small></span>
+     </button>
     </div>
-    <aside className="ama-m8-trust-card" aria-label="Safety boundaries">
-     <div><ShieldCheck size={18} aria-hidden="true"/><strong>User wallet custody</strong></div>
-     <p>Agent cannot approve or sign. Native Testnet transfers require M3/M4 human-controlled checks.</p>
-     <div><Activity size={18} aria-hidden="true"/><strong>Chain evidence, not estimates</strong></div>
-     <p>No transaction is called settled without matching independently verified M4 finality.</p>
-    </aside>
    </div>
   </header>
+  <aside className="ama-m8-trust-card" aria-label="Safety boundaries">
+   <div><ShieldCheck size={20} aria-hidden="true"/><div><strong>User wallet custody</strong>
+    <p>Agent cannot approve or sign. Native Testnet transfers require M3/M4 human-controlled checks.</p></div></div>
+   <div><Activity size={20} aria-hidden="true"/><div><strong>Independently verified chain evidence</strong>
+    <p>No transaction is called settled without matching independently verified M4 finality.</p></div></div>
+  </aside>
 
   <div className="ama-m8-network-grid" aria-label="Testnet connection and safety status">
    <div><small>Network</small><strong>Amadeus Testnet</strong></div>
@@ -118,7 +146,7 @@ export default function AmadeusWorkspace({seed=null}){
    <button type="button" className="ama-m8-text-link" onClick={refreshHealth} disabled={healthBusy}>
     {healthBusy?"Checking RPC…":"Recheck RPC"}</button>
   </div>
-  <nav className="ama-m8-navigation" aria-label="Amadeus Testnet workspace sections">
+  <nav className="ama-m8-navigation" ref={navigationRef} aria-label="Amadeus Testnet workspace sections">
    <div className="ama-m8-nav-scroll">
     {AMADEUS_TABS.map(item=><button key={item.id} type="button"
      className={"ama-m8-nav-item "+(active===item.id?"is-active":"")}

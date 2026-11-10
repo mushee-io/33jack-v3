@@ -1,17 +1,17 @@
-.ama-identity{margin:18px 0 26px;padding:22px;border:1px solid #33556b;border-radius:17px;background:#0c1721;color:#e9f2f6}
+.ama-identity{margin:18px 0 26px;padding:22px;border:1px solid var(--ama-border);border-radius:17px;background:var(--ama-surface);color:var(--ama-ink)}
 .ama-identity-heading{display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between}
 .ama-identity h3{margin:6px 0;font-size:20px}.ama-identity h4{margin:0 0 12px;font-size:14px}
-.ama-identity p{font-size:13px;line-height:1.6;color:#a9c0cd}
-.ama-identity-state{font-size:11px;letter-spacing:.07em;border:1px solid #497489;border-radius:30px;padding:7px 11px}
+.ama-identity p{font-size:13px;line-height:1.6;color:var(--ama-muted)}
+.ama-identity-state{font-size:11px;letter-spacing:.07em;border:1px solid var(--ama-border);border-radius:30px;padding:7px 11px}
 .ama-identity-actions{display:flex;gap:9px;flex-wrap:wrap;margin:15px 0}
-.ama-identity button{border:1px solid #4a7184;background:#183146;color:#eaf2f6;border-radius:10px;padding:10px 13px;cursor:pointer}
+.ama-identity button{border:1px solid var(--ama-border);background:var(--ama-surface);color:var(--ama-ink);border-radius:10px;padding:10px 13px;cursor:pointer}
 .ama-identity button:disabled{cursor:not-allowed;opacity:.42}
 .ama-identity-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;margin-top:17px}
-.ama-identity-grid>div{padding:16px;border-radius:12px;border:1px solid #294354}
+.ama-identity-grid>div{padding:16px;border-radius:12px;border:1px solid var(--ama-border)}
 .ama-identity label{display:grid;gap:5px;font-size:12px;margin:10px 0}
-.ama-identity input,.ama-identity select{width:100%;min-width:0;background:#09111b;border:1px solid #456174;border-radius:8px;color:#fff;padding:10px}
+.ama-identity input,.ama-identity select{width:100%;min-width:0;background:var(--ama-surface);border:1px solid var(--ama-border);border-radius:8px;color:var(--ama-ink);padding:10px}
 .ama-identity li{margin:7px 0;font-size:13px}
 .ama-identity code{overflow-wrap:anywhere;font-size:12px}
-.ama-identity-token{display:block;padding:8px;margin-top:6px;border:1px dashed #638}
-.ama-identity-warning{border-left:3px solid #c49f66;padding-left:12px}
+.ama-identity-token{display:block;padding:8px;margin-top:6px;border:1px dashed var(--ama-border)}
+.ama-identity-warning{border-left:3px solid var(--ama-warning-line);padding-left:12px}
 @media(max-width:800px){.ama-identity-grid{grid-template-columns:1fr}.ama-identity{padding:16px}}
