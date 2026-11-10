@@ -89,16 +89,16 @@ export function buildRiskReport({proposal=null,beneficiaries=[],invoices=[],inte
     if(BigInt(proposal.atomicUnits)>10_000_000_000n)
       flag("HIGH_AMOUNT",15,"Proposed amount exceeds ten AMA; human review required");
     if(proposal.invoiceRef){
-      const match=invoices.find(x=>x.invoice_ref===proposal.invoiceRef);
+      const match=invoices.find(x=>(x.invoice_ref??x.invoiceRef)===proposal.invoiceRef);
       if(!match)flag("INVOICE_NOT_FOUND",15,"No matching workspace invoice note is available");
       else {
         if(match.contains_injection||match.containsInjection)
           flag("UNTRUSTED_INVOICE_INJECTION",35,"Invoice text contains instructions that must not control the agent");
-        if(match.source_status!=="manually_entered_unverified")
+        if((match.source_status??match.source)!=="manually_entered_unverified")
           flag("UNKNOWN_INVOICE_SOURCE",15,"Invoice source provenance is not trusted");
         if(match.recipient&&match.recipient!==proposal.recipient)
           flag("INVOICE_RECIPIENT_MISMATCH",40,"Recipient differs from human-entered invoice notes");
-        if(match.amount_units&&String(match.amount_units)!==proposal.atomicUnits)
+        if((match.amount_units??match.amountUnits)&&String(match.amount_units??match.amountUnits)!==proposal.atomicUnits)
           flag("INVOICE_AMOUNT_MISMATCH",40,"Amount differs from human-entered invoice notes");
       }
     }
