@@ -416,7 +416,7 @@ function compactStatus(payments = []) {
     ["analyzed", "approved", "settling", "failed"].includes(String(p.status || ""))
   );
   const settled = payments.filter((p) =>
-    ["settled_demo", "settled_devnet", "settled_celo"].includes(String(p.status || ""))
+    ["settled_demo", "settled_devnet", "settled_ama"].includes(String(p.status || ""))
   );
   const flagged = payments.filter((p) => riskFlags(p.risk).length > 0);
   return { active, settled, flagged };
@@ -647,7 +647,7 @@ export async function sendWeChatPaymentReceipt({ payment, wechatOpenId, base = "
     return { ok: true, idempotent: false, suppressed: true };
   }
 
-  if (!["settled_demo", "settled_devnet", "settled_celo"].includes(String(payment.status || ""))) {
+  if (!["settled_demo", "settled_devnet", "settled_ama"].includes(String(payment.status || ""))) {
     throw new Error(`Payment is not settled yet (current status: ${payment.status || "unknown"})`);
   }
 
@@ -661,8 +661,8 @@ export async function sendWeChatPaymentReceipt({ payment, wechatOpenId, base = "
   const amount = payment.source_amount && payment.source_currency
     ? `${payment.source_currency} ${Number(payment.source_amount).toLocaleString()}`
     : "—";
-  const status = payment.status === "settled_celo" ? "Settled on Celo Mainnet" :
-    payment.status === "settled_devnet" ? "Settled on Solana Devnet" : "Settled in controlled demo";
+  const status = payment.status === "settled_ama" ? "Settled on Amadeus Testnet" :
+    payment.status === "settled_devnet" ? "Settled on Amadeus Testnet" : "Settled in controlled demo";
 
   const lines = [
     "33Jack payment complete",
@@ -672,7 +672,7 @@ export async function sendWeChatPaymentReceipt({ payment, wechatOpenId, base = "
     `Invoice amount: ${amount}`,
     `Destination: ${payment.destination_amount || payment.destination_currency || "—"}`,
     `Status: ${status}`,
-    payment.approval?.celo ? `Celo settlement: ${payment.approval.celo.amount} ${payment.approval.celo.token}` : null,
+    payment.approval?.ama ? `AMA settlement: ${payment.approval.ama.amount} ${payment.approval.ama.token}` : null,
     "Reconciled: ✓",
     payment.settlement_signature ? `Reference: ${payment.settlement_signature}` : null
   ].filter(Boolean);
@@ -680,11 +680,11 @@ export async function sendWeChatPaymentReceipt({ payment, wechatOpenId, base = "
   if (payment.status === "settled_devnet" && payment.settlement_signature) {
     lines.push(
       "",
-      `Solana Explorer: https://explorer.solana.com/tx/${payment.settlement_signature}?cluster=devnet`
+      `Amadeus Explorer: https://explorer.amadeus.com/tx/${payment.settlement_signature}?cluster=devnet`
     );
   }
-  if (payment.status === "settled_celo" && payment.settlement_signature) {
-    lines.push("", `Celo Explorer: https://celoscan.io/tx/${payment.settlement_signature}`);
+  if (payment.status === "settled_ama" && payment.settlement_signature) {
+    lines.push("", `AMA Explorer: https://amascan.io/tx/${payment.settlement_signature}`);
   }
   if (base) lines.push("", `Open 33Jack: ${base}`);
 
@@ -778,7 +778,7 @@ async function processWeChatMessage(req, message) {
     const reviewUrl = signedReviewUrl(base, analysis, openId, workspace.id);
     await sendText(
       openId,
-      `${invoiceSummary(analysis)}${reviewUrl ? `\n\nReview & Pay: ${reviewUrl}\nCelo wallet checkout: ${reviewUrl.replace("/?channel=", "/app/celo?channel=")}` : ""}`
+      `${invoiceSummary(analysis)}${reviewUrl ? `\n\nReview & Pay: ${reviewUrl}\nAMA wallet checkout: ${reviewUrl.replace("/?channel=", "/app/ama?channel=")}` : ""}`
     );
     return;
   }
@@ -914,7 +914,7 @@ async function processWeChatMessage(req, message) {
 
   if (reviewRequested && referenced) {
     const state = String(referenced.status || "");
-    if (["settled_demo", "settled_devnet", "settled_celo"].includes(state)) {
+    if (["settled_demo", "settled_devnet", "settled_ama"].includes(state)) {
       await sendText(
         openId,
         `${referenced.supplier || "This invoice"} is already settled. Reference: ${referenced.invoice_number || referenced.invoice_name || referenced.id}.`
@@ -941,7 +941,7 @@ async function processWeChatMessage(req, message) {
         blockers.length
           ? `Review required: ${blockers.join("; ")}.`
           : "No active deterministic risk flag is currently recorded.",
-        reviewUrl ? `Review & Pay: ${reviewUrl}\nCelo wallet checkout: ${reviewUrl.replace("/?channel=", "/app/celo?channel=")}` : null
+        reviewUrl ? `Review & Pay: ${reviewUrl}\nAMA wallet checkout: ${reviewUrl.replace("/?channel=", "/app/ama?channel=")}` : null
       ].filter(Boolean).join("\n")
     );
     await addAuditEvent(
