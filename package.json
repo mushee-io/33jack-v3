@@ -25,7 +25,11 @@
     "test:m6": "node --test scripts/test-m6-invoice.mjs",
     "test:m6:db": "node --test scripts/test-m6-invoice-db.mjs",
     "test:m6:restore": "node --test scripts/test-m6-restore.mjs",
-    "migrate:m6": "node scripts/migrate-m6.mjs"
+    "migrate:m6": "node scripts/migrate-m6.mjs",
+    "test:m7": "node --test scripts/test-m7-governance.mjs",
+    "test:m7:db": "node --test scripts/test-m7-governance-db.mjs",
+    "test:m7:restore": "node --test scripts/test-m7-restore.mjs",
+    "migrate:m7": "node scripts/migrate-m7.mjs"
   },
   "dependencies": {
     "@vitejs/plugin-react": "^4.3.4",

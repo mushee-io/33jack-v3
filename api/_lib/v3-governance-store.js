@@ -4,7 +4,7 @@
  * Policy row locks serialize finance decisions with policy mutations.
  */
 import {randomUUID} from "node:crypto";
-import {identityDB} from "./v3-identity-store.js";
+import {paymentDB} from "./v3-payment-store.js";
 import {hasPermission,nativeAddress} from "./v3-identity-core.js";
 import {PaymentError,assertWorkspaceId,assertIntentId} from "./v3-payment-core.js";
 import {
@@ -26,7 +26,7 @@ const DDL=[
  "DO $body$ BEGIN IF NOT EXISTS (SELECT 1 FROM pg_trigger WHERE tgname='ama_v3_m7_no_update_or_delete') THEN CREATE TRIGGER ama_v3_m7_no_update_or_delete BEFORE UPDATE OR DELETE ON ama_v3_m7_events FOR EACH ROW EXECUTE FUNCTION ama_v3_m7_immutable_events(); END IF; END $body$"
 ];
 export async function governanceDB(){
- const sql=await identityDB();
+ const sql=await paymentDB();
  if(!initialized)initialized=(async()=>{for(const ddl of DDL)await sql.unsafe(ddl);return true})().catch(e=>{initialized=null;throw e});
  await initialized;return sql;
 }

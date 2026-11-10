@@ -16,7 +16,7 @@ const SCHEMA=[
 export async function paymentDB(){
  const sql=await identityDB();
  if(!initialized)initialized=(async()=>{for(const ddl of SCHEMA)await sql.unsafe(ddl);return true})().catch(e=>{initialized=null;throw e});
- await initialized;await governanceDB();return sql;
+ await initialized;return sql;
 }
 async function membership(sql,address,workspaceId,action){
  const r=await sql.unsafe("SELECT role FROM ama_v3_memberships WHERE address=$1 AND workspace_id=$2 LIMIT 1",[address,workspaceId]);
@@ -52,7 +52,7 @@ export async function createIntent({input,actor,idempotencyKey}){
  const key=assertIdempotencyKey(idempotencyKey);
  const keyHash=sha256(["v3",workspaceId,actor,key].join("\n"));
  const requestHash=requestFingerprint(normalized);
- const sql=await paymentDB();
+ const sql=await paymentDB();await governanceDB();
  return sql.begin(async tx=>{
   await membership(tx,actor,workspaceId,"payment:propose");
   const found=await tx.unsafe("SELECT * FROM ama_v3_payment_intents WHERE workspace_id=$1 AND created_by=$2 AND idempotency_hash=$3 LIMIT 1",[workspaceId,actor,keyHash]);
@@ -98,7 +98,7 @@ export async function listIntents({workspaceId,actor}){
 export async function transitionIntent({workspaceId,id,actor,expectedHash,action}){
  workspaceId=assertWorkspaceId(workspaceId);id=assertIntentId(id);
  if(!["review","approve","cancel"].includes(action))throw new PaymentError(400,"Unsupported M3 transition");
- const sql=await paymentDB();
+ const sql=await paymentDB();await governanceDB();
  return sql.begin(async tx=>{
   const m=await membership(tx,actor,workspaceId,action==="cancel"?"payment:read":"payment:approve");
   const rows=await tx.unsafe("SELECT * FROM ama_v3_payment_intents WHERE id=$1 AND workspace_id=$2 FOR UPDATE",[id,workspaceId]);

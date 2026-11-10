@@ -3,7 +3,7 @@ import {paymentDB} from "./v3-payment-store.js";
 import {PaymentError,assertIntentId,assertWorkspaceId} from "./v3-payment-core.js";
 import {authorizeExecutionIntent,executionIsTerminal} from "./v3-execution-core.js";
 import {hasPermission} from "./v3-identity-core.js";
-import {guardExecution} from "./v3-governance-store.js";
+import {governanceDB,guardExecution} from "./v3-governance-store.js";
 
 let initialized;
 const DDL=[
@@ -13,7 +13,7 @@ const DDL=[
 export async function executionDB(){
  const sql=await paymentDB();
  if(!initialized)initialized=(async()=>{for(const statement of DDL)await sql.unsafe(statement);return true})().catch(e=>{initialized=null;throw e});
- await initialized;return sql;
+ await initialized;await governanceDB();return sql;
 }
 async function permission(sql,actor,workspaceId,action){
  const r=await sql.unsafe("SELECT role FROM ama_v3_memberships WHERE workspace_id=$1 AND address=$2 LIMIT 1",[workspaceId,actor]);
