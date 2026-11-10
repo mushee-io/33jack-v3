@@ -16,7 +16,7 @@ if(process.env.GITHUB_ACTIONS==="true"){
  const sha=process.env.M10_SOURCE_SHA||process.env.GITHUB_SHA||"";
  if(!/^[a-f0-9]{40}$/.test(sha))
   throw Error("M10 GitHub CI evidence requires an exact 40-character source commit");
- const branch=process.env.GITHUB_HEAD_REF||String(process.env.GITHUB_REF||"").replace(/^refs\\/heads\\//,"");
+ const branch=process.env.GITHUB_HEAD_REF||String(process.env.GITHUB_REF||"").replace("refs/heads/","");
  const base=process.env.GITHUB_BASE_REF||"";
  const originalM10=branch==="feat/ama-v3-m10-final-testnet-demo-grants"&&
   (base===""||base==="feat/ama-v3-m9-e2e-security-acceptance");
