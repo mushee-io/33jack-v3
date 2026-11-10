@@ -5,10 +5,10 @@ import { AmadeusSDK } from "@amadeus-protocol/sdk";
 const API = "/api/v3/operator";
 const AMA = "/api/v3/ama";
 const DEFAULT_NETWORK = {
-  chainId: Testnet, chainIdHex: "", name: "Amadeus Testnet",
-  rpcUrls: ["https://testnet-rpc.ama.one/api"],
-  nativeCurrency: { name: "Amadeus", symbol: "AMA", decimals: 18 },
-  explorer: "https://amascan.io"
+  id:"amadeus-testnet",name:"Amadeus Testnet",
+  rpcUrl:"https://testnet-rpc.ama.one/api",
+  nativeCurrency:{name:"AMA",symbol:"AMA",decimals:8},
+  explorer:"https://testnet-ama.ddns.net"
 };
 
 async function jsonResponse(response) {
