@@ -228,6 +228,9 @@ function fallbackAnswer(message, payments) {
 }
 
 export default async function handler(req, res) {
+  // 33JACK V3: imported non-Amadeus payment and webhook rails are fully disabled.
+  if (process.env.NODE_ENV !== "test")
+    return res.status(410).json({error:"Legacy payment endpoint disabled. Use native Amadeus Testnet V3."});
   const provider = String(req.query?.provider || "").toLowerCase();
 
   if (provider === "whatsapp" && req.method === "GET") {

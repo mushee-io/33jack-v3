@@ -208,6 +208,9 @@ async function handleWiseWebhook(req, res, rawBody) {
 }
 
 export default async function handler(req, res) {
+  // 33JACK V3: imported non-Amadeus payment and webhook rails are fully disabled.
+  if (process.env.NODE_ENV !== "test")
+    return res.status(410).json({error:"Legacy payment endpoint disabled. Use native Amadeus Testnet V3."});
   if (!["GET", "POST"].includes(req.method)) {
     return res.status(405).json({ error: "GET or POST only" });
   }

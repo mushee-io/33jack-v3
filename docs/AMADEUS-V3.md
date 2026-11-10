@@ -6,7 +6,7 @@ This branch begins the complete Celo-to-Amadeus migration. V2 is unchanged. V3 t
 - MIT LICENSE and official `@amadeus-protocol/sdk` dependency.
 - Native testnet adapter for network health, Base58 account validation, precise AMA atomic-unit conversion, balance lookup, unsigned Coin.transfer plan and transaction lookup.
 - New wallet-connected Amadeus workspace: testnet confirmation, independent exact review, extension signing, testnet submission and manual receipt inspection.
-- Legacy payment routes are disabled by the V3 router; V3 routes are testnet-only.
+- Legacy payment routes, Solana settlement/payout HTTP endpoints, and old webhook handlers are hard-disabled in non-test V3 deployments; V3 routes are testnet-only.
 - Consolidated `/api/v3/ama` handler routed to the existing Vercel serverless entrypoint. The obsolete Celo config endpoint is removed from the consolidated router.
 
 ## Configuration
