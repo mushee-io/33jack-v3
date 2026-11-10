@@ -2,9 +2,9 @@ name: 33JACK V3 Testnet CI
 
 on:
   push:
-    branches: ["main", "feat/amadeus-testnet-v3", "feat/ama-v3-m1-foundation"]
+    branches: ["main", "feat/amadeus-testnet-v3", "feat/ama-v3-m1-foundation", "feat/ama-v3-m2-wallet-identity"]
   pull_request:
-    branches: ["main", "feat/amadeus-testnet-v3"]
+    branches: ["main", "feat/amadeus-testnet-v3", "feat/ama-v3-m1-foundation"]
 
 permissions:
   contents: read
@@ -30,6 +30,8 @@ jobs:
         run: npm run test:isolation
       - name: Enforce M1 repo/network invariants
         run: npm run test:m1
+      - name: Test M2 wallet identity, BLS auth and RBAC
+        run: npm run test:m2
       - name: Check Vercel function budget and routes
         run: npm run test:vercel
       - name: Build frontend
