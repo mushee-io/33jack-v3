@@ -889,19 +889,19 @@ export function persistenceMode() {
 }
 
 
-// Celo uses its own approval/transaction state. Mirror a confirmed invoice
-// into the legacy dashboard only after onchain confirmation in jack_v2_intents.
-export async function markCeloInvoiceSettled(paymentId, workspaceId, txHash, intent = null) {
+// AMA uses its own approval/transaction state. Mirror a confirmed invoice
+// into the legacy dashboard only after onchain confirmation in jack_v3_intents.
+export async function markAMAInvoiceSettled(paymentId, workspaceId, txHash, intent = null) {
   const client = db();
-  if (!client) throw new Error("DATABASE_URL required for confirmed Celo invoices");
+  if (!client) throw new Error("DATABASE_URL required for confirmed AMA invoices");
   await ensureSchema();
-  const settlement = { celo: intent ? {
-    chain_id: 42220, token: intent.token, amount: intent.amount,
+  const settlement = { ama: intent ? {
+    chain_id: 0, token: intent.token, amount: intent.amount,
     recipient: intent.recipient, payer: intent.payer, tx_hash: String(txHash)
-  } : {chain_id:42220,tx_hash:String(txHash)} };
+  } : {chain_id:0,tx_hash:String(txHash)} };
   const rows = await client`
     update jack_payments set
-      status = 'settled_celo',
+      status = 'settled_ama',
       approval = coalesce(approval,'{}'::jsonb) || ${JSON.stringify(settlement)}::jsonb,
       settlement_signature = ${String(txHash)},
       updated_at = now()
@@ -911,13 +911,13 @@ export async function markCeloInvoiceSettled(paymentId, workspaceId, txHash, int
     returning id
   `;
   if (rows.length) {
-    await addAuditEvent(paymentId, "payment_status_changed", "celo-v2-rail", {
-      to:"settled_celo", signature:String(txHash), chain_id:42220,
+    await addAuditEvent(paymentId, "payment_status_changed", "ama-v2-rail", {
+      to:"settled_ama", signature:String(txHash), chain_id:0,
       workspace_id:String(workspaceId)
     });
     return true;
   }
   const existing = await getPayment(paymentId);
-  return existing?.status === "settled_celo" &&
+  return existing?.status === "settled_ama" &&
     String(existing?.settlement_signature || "").toLowerCase() === String(txHash).toLowerCase();
 }
