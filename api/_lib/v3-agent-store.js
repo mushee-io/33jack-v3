@@ -31,7 +31,7 @@ export async function requireAgentMembership(sql,{actor,workspaceId,permission="
 }
 export async function agentRateEvent({workspaceId,actor,event,input,limit=30}){
  workspaceId=assertWorkspaceId(workspaceId);
- if(typeof event!=="string"||!/^[a-z_]{3,50}$/.test(event))throw new PaymentError(400,"Invalid agent event");
+ if(typeof event!=="string"||!/^[a-z0-9_]{3,50}$/.test(event))throw new PaymentError(400,"Invalid agent event");
  const sql=await agentDB();
  return sql.begin(async tx=>{
   await requireAgentMembership(tx,{actor,workspaceId});

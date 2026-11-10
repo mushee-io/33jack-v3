@@ -38,7 +38,11 @@ export function parseNaturalPayment(text,{wallet,beneficiaries=[]}={}){
  const pattern=/^(?:please\s+)?(?:prepare|draft|propose)\s+(?:an?\s+)?(?:ama\s+)?payment\s+of\s+((?:0|[1-9]\d{0,11})(?:\.\d{1,9})?)\s+AMA\s+to\s+([1-9A-HJ-NP-Za-km-z]{60,85})(?:\s+for\s+invoice\s+([A-Za-z0-9/_-]{2,90}))?\.?$/i;
  const match=cleaned.match(pattern);
  if(!match)return {recognized:false,reason:"Use: Prepare payment of 0.01 AMA to [native Amadeus address] for invoice INV-123"};
- const p=normalizeAmaProposal({payer:wallet,recipient:match[2],amount:match[1],token:"AMA",network:AMA_TESTNET.id});
+ let p;
+ try{p=normalizeAmaProposal({payer:wallet,recipient:match[2],amount:match[1],token:"AMA",network:AMA_TESTNET.id})}
+ catch{
+  return {recognized:false,reason:"Native Testnet amount, wallet or recipient validation failed; no financial action was taken"};
+ }
  const b=beneficiaries.find(row=>row.address===p.recipient);
  const ready=b?.status==="allowed";
  return {
