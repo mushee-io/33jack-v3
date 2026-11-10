@@ -38,7 +38,12 @@
     "test:m9:db": "node --test scripts/test-m9-acceptance-db.mjs",
     "test:m9:restore": "node --test scripts/test-m9-restore.mjs",
     "migrate:m9": "node scripts/migrate-m9.mjs",
-    "m9:ci-report": "node scripts/m9-ci-report.mjs"
+    "m9:ci-report": "node scripts/m9-ci-report.mjs",
+    "test:m10": "node --test scripts/test-m10-demo.mjs",
+    "test:m10:db": "node --test scripts/test-m10-demo-db.mjs",
+    "test:m10:restore": "node --test scripts/test-m10-restore.mjs",
+    "m10:preflight": "node scripts/m10-preflight.mjs",
+    "m10:ci-artifact": "node scripts/m10-ci-artifact.mjs"
   },
   "dependencies": {
     "@vitejs/plugin-react": "^4.3.4",

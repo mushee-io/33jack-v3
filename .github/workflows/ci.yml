@@ -2,12 +2,16 @@ name: 33JACK V3 Testnet CI
 
 on:
   push:
-    branches: ["main", "feat/amadeus-testnet-v3", "feat/ama-v3-m1-foundation", "feat/ama-v3-m2-wallet-identity", "feat/ama-v3-m3-payment-intents", "feat/ama-v3-m4-execution-receipts", "feat/ama-v3-m5-ai-agent", "feat/ama-v3-m6-invoice-reconciliation", "feat/ama-v3-m7-compliance-governance", "feat/ama-v3-m8-testnet-experience", "feat/ama-v3-m9-e2e-security-acceptance"]
+    branches: ["main", "feat/amadeus-testnet-v3", "feat/ama-v3-m1-foundation", "feat/ama-v3-m2-wallet-identity", "feat/ama-v3-m3-payment-intents", "feat/ama-v3-m4-execution-receipts", "feat/ama-v3-m5-ai-agent", "feat/ama-v3-m6-invoice-reconciliation", "feat/ama-v3-m7-compliance-governance", "feat/ama-v3-m8-testnet-experience", "feat/ama-v3-m9-e2e-security-acceptance", "feat/ama-v3-m10-final-testnet-demo-grants"]
   pull_request:
-    branches: ["main", "feat/amadeus-testnet-v3", "feat/ama-v3-m1-foundation", "feat/ama-v3-m2-wallet-identity", "feat/ama-v3-m3-payment-intents", "feat/ama-v3-m4-execution-receipts", "feat/ama-v3-m5-ai-agent", "feat/ama-v3-m6-invoice-reconciliation", "feat/ama-v3-m7-compliance-governance", "feat/ama-v3-m8-testnet-experience"]
+    branches: ["main", "feat/amadeus-testnet-v3", "feat/ama-v3-m1-foundation", "feat/ama-v3-m2-wallet-identity", "feat/ama-v3-m3-payment-intents", "feat/ama-v3-m4-execution-receipts", "feat/ama-v3-m5-ai-agent", "feat/ama-v3-m6-invoice-reconciliation", "feat/ama-v3-m7-compliance-governance", "feat/ama-v3-m8-testnet-experience", "feat/ama-v3-m9-e2e-security-acceptance"]
 
 permissions:
   contents: read
+
+# Exact PR head source, not a synthetic GitHub merge commit.
+env:
+  M10_SOURCE_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
 
 jobs:
   testnet-foundation:
@@ -16,6 +20,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
       - name: Setup Node 22
         uses: actions/setup-node@v4
         with:
@@ -48,6 +54,10 @@ jobs:
         run: npm run test:m9
       - name: M9 privilege, secret, governance and source security review
         run: npm run test:m9:security
+      - name: M10 privacy-safe grant snapshot, fail-closed release and accessible operator UI
+        run: npm run test:m10
+      - name: M10 official native Testnet and protected Preview preparation
+        run: npm run m10:preflight
       - name: Check Vercel function budget and routes
         run: npm run test:vercel
       - name: Build frontend
@@ -76,6 +86,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
       - name: Setup Node 22
         uses: actions/setup-node@v4
         with:
@@ -111,6 +123,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
       - name: Setup Node 22
         uses: actions/setup-node@v4
         with:
@@ -147,6 +161,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
       - name: Setup Node 22
         uses: actions/setup-node@v4
         with:
@@ -184,6 +200,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
       - name: Setup Node 22
         uses: actions/setup-node@v4
         with:
@@ -232,6 +250,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
       - name: Setup Node 22
         uses: actions/setup-node@v4
         with:
@@ -282,6 +302,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
       - name: Setup Node 22
         uses: actions/setup-node@v4
         with:
@@ -328,6 +350,8 @@ jobs:
     steps:
       - name: Checkout exact M9 commit
         uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
       - name: Setup Node 22
         uses: actions/setup-node@v4
         with:
@@ -361,5 +385,74 @@ jobs:
         with:
           name: m9-synthetic-ci-acceptance
           path: m9-artifacts/m9-synthetic-acceptance.json
+          if-no-files-found: ignore
+          retention-days: 7
+
+  m10-disposable-postgres:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: postgres
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 15
+    env:
+      DATABASE_URL: postgres://postgres:postgres@127.0.0.1:5432/postgres
+      AMA_TESTNET_RPC_URL: https://testnet-rpc.ama.one/api
+      AMA_M4_ENABLE_BROADCAST: "false"
+      AMA_M4_WALLET_EXTENSION_VERIFIED: "false"
+      AMA_M4_TWO_WALLET_ACCEPTANCE_VERIFIED: "false"
+      AMA_M5_ALLOW_REMOTE_AI: "false"
+      PGPASSWORD: postgres
+    steps:
+      - name: Checkout exact M10 source commit
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - name: Setup Node 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Clean install (lockfile absence remains a separate release blocker)
+        run: npm install --ignore-scripts
+      - name: M10 offline Testnet-only environment/security preflight
+        run: npm run m10:preflight
+      - name: M10 zero critical/high dependency advisory gate
+        run: |
+          npm audit --omit=dev --json > m10-audit.json || true
+          node scripts/m9-dependency-audit.mjs m10-audit.json
+          node --input-type=module -e 'import {readFileSync} from "node:fs"; const v=JSON.parse(readFileSync("m10-audit.json")).metadata.vulnerabilities; if(!Number.isInteger(v.high)||v.high!==0||v.critical!==0)process.exit(1)'
+      - name: M9 predecessor complete financial and security synthetic acceptance
+        run: npm run test:m9:db
+      - name: M10 owner-only redacted grant export, privacy and HTTP isolation acceptance
+        run: npm run test:m10:db
+      - name: Generate exact-SHA source-pinned redacted Testnet evidence artifact
+        run: npm run m10:ci-artifact
+      - name: Independent M10 PostgreSQL backup/restore of M2–M9 records
+        run: |
+          pg_dump --format=custom --no-owner --no-privileges --dbname="$DATABASE_URL" --file=m10-backup.dump
+          psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -c "CREATE DATABASE m10restore;"
+          pg_restore --no-owner --no-privileges --exit-on-error --dbname="postgres://postgres:postgres@127.0.0.1:5432/m10restore" m10-backup.dump
+      - name: Verify restored SHA, invoice provenance, M4 one attempt, M7/M9 append-only
+        env:
+          DATABASE_URL: postgres://postgres:postgres@127.0.0.1:5432/m10restore
+        run: npm run test:m10:restore
+      - name: Upload synthetic-only grant-readiness evidence, no live-transfer claims
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: m10-synthetic-grant-evidence
+          path: |
+            m10-artifacts/m10-grant-evidence.json
+            m10-artifacts/m10-sha256.txt
           if-no-files-found: ignore
           retention-days: 7
